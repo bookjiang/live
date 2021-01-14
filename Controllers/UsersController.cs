@@ -13,7 +13,7 @@ namespace live.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly LiveMultiContext _context;
+        private  LiveMultiContext _context;
 
         public UsersController(LiveMultiContext context)
         {
@@ -112,6 +112,13 @@ namespace live.Controllers
         }
 
 
+
+
+        /// <summary>
+        /// 用户注册
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         [HttpPost("logon")]
         public JsonResult register(User user)
         {
@@ -132,6 +139,86 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
+
+
+        /// <summary>
+        /// 用户登录
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        [HttpPost("login")]
+        public JsonResult login(User user)
+        {
+            ResultState resultState = new ResultState();
+            if (!UserNameExists(user.name))
+            {
+                resultState.success = false;
+                resultState.message = "用户名不存在";
+                return new JsonResult(resultState);
+            }
+            var user1 = _context.Users.Where(x => x.name == user.name).FirstOrDefault();  //lambda表达式写错=>写成==>
+            if (user.psd == user1.psd)
+            {
+                resultState.success = true;
+                resultState.message = "登录成功";
+                resultState.value = user1;
+                return new JsonResult(resultState);
+
+            }
+            else
+            {
+                resultState.success = false;
+                resultState.message = "密码错误";
+                return new JsonResult(resultState);
+            }
+
+
+        }
+
+        [HttpPut("updateInfo")]
+        public JsonResult updateInfo(User user)
+        {
+            ResultState resultState = new ResultState();
+            if (!UserExists(user.id))
+            {
+                resultState.success = false;
+                resultState.message = "用户id不存在";
+                return new JsonResult(resultState);
+            }
+            var user1 = _context.Users.Find(user.id);
+
+            if (user1.name != user.name && UserNameExists(user.name))
+            {
+                resultState.success = false;
+                resultState.message = "用户名已存在，请更换";
+                return new JsonResult(resultState);
+
+            }
+            //直接用user1=user赋值不行，原理未知
+            user1.name = user.name;
+            user1.id_no = user.id_no;
+            user1.tel = user.tel;
+            user1.psd = user.psd;
+            //_context.Users.Update(user);
+            var count = _context.SaveChanges();
+            if (count == 1)
+            {
+                resultState.success = true;
+                resultState.message = "信息更新成功";
+                resultState.value = user;
+            }
+            else
+            {
+                resultState.success = false;
+                resultState.message = "信息更新失败";
+                return new JsonResult(resultState);
+            }
+                
+            return new JsonResult(resultState);
+
+
+
+        }
 
 
 

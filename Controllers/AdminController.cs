@@ -44,29 +44,47 @@ namespace live.Controllers
             return _context.Admins.Find(id);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        [HttpPost("login")]
+        public JsonResult login(Admin admin)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            ResultState resultState = new ResultState();
+            if (!UserNameExists(admin.name))
             {
-                return NotFound();
+                resultState.success = false;
+                resultState.message = "用户名不存在";
+                return new JsonResult(resultState);
             }
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-            return NoContent();
+            var admin1 = _context.Admins.Where(x => x.name == admin.name).FirstOrDefault();
+            if (admin.psd == admin1.psd)
+            {
+                resultState.success = true;
+                resultState.message = "登录成功";
+                resultState.value = admin1;
+                return new JsonResult(resultState);
+
+            }
+            else
+            {
+                resultState.success = false;
+                resultState.message = "密码错误";
+                return new JsonResult(resultState);
+            }
+
+
+
         }
 
-        public async Task<ActionResult<User>> ModVedioStatus(int id)
+
+
+
+
+
+        public bool UserNameExists(string name)
         {
-            //var user = User GetUser(id);
-            var user = await _context.Users.FindAsync(id);
-            if (IsOnline(status))
-            {
-                return 
-            }
-            
-            return user;
+            return _context.Admins.Any(e => e.name == name);
         }
+
+
+
     }
 }
