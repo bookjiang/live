@@ -40,8 +40,8 @@ namespace live
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseRouting();
-
+            app.UseRouting(); 
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
