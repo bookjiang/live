@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using live.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -11,12 +12,19 @@ namespace live.Controllers
     [ApiController]
     public class AdminController : ControllerBase
     {
+        private readonly LiveMultiContext _context;
+
+        public AdminController(LiveMultiContext context)
+        {
+            _context = context;
+        }
+
 
 
         [HttpGet("{id}")]
-        public ActionResult<int> Get(int id)
+        public ActionResult<Admin> Get(int id)
         {
-            return id;
+            return _context.Admins.Find(id);
         }
     }
 }

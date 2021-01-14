@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using live.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace live.Controllers
 {
@@ -105,5 +105,40 @@ namespace live.Controllers
         {
             return _context.Users.Any(e => e.id == id);
         }
+
+        public bool UserNameExists(string name)
+        {
+            return _context.Users.Any(e => e.name == name);
+        }
+
+
+        [HttpPost("logon")]
+        public JsonResult register(User user)
+        {
+            ResultState resultState = new ResultState();
+            if (UserNameExists(user.name))
+            {
+                resultState.success = false;
+                resultState.message = "用户已存在";
+                return new JsonResult(resultState);
+            }
+
+            _context.Users.Add(user);
+            _context.SaveChanges();
+            resultState.success = true;
+            resultState.code = 1;
+            resultState.message = "注册成功";
+            resultState.value = user;
+            return new JsonResult(resultState);
+        }
+
+
+
+
+
+
+
+
+
     }
 }
