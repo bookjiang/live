@@ -26,5 +26,48 @@ namespace live.Controllers
         {
             return _context.Admins.Find(id);
         }
+
+        [HttpPost("login")]
+        public JsonResult login(Admin admin)
+        {
+            ResultState resultState = new ResultState();
+            if (!UserNameExists(admin.name))
+            {
+                resultState.success = false;
+                resultState.message = "用户名不存在";
+                return new JsonResult(resultState);
+            }
+            var admin1 = _context.Admins.Where(x => x.name == admin.name).FirstOrDefault();
+            if (admin.psd == admin1.psd)
+            {
+                resultState.success = true;
+                resultState.message = "登录成功";
+                resultState.value = admin1;
+                return new JsonResult(resultState);
+
+            }
+            else
+            {
+                resultState.success = false;
+                resultState.message = "密码错误";
+                return new JsonResult(resultState);
+            }
+
+
+
+        }
+
+
+
+
+
+
+        public bool UserNameExists(string name)
+        {
+            return _context.Admins.Any(e => e.name == name);
+        }
+
+
+
     }
 }
