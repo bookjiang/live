@@ -20,23 +20,7 @@ namespace live.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
-        {
-            return await _context.Users.ToList();
-        }
-
-        public async Task<IActionResult> GetRecordVedio(int id)
-        {
-            var record_vedio = await _context.RecordVideos.FindAsync(id);
-            return (IActionResult)record_vedio;
-        }
-
-        public bool IsOnline(int roomId)//直播间id
-        {
-            var status = _context.RecordVideos.FindAsync(roomId);
-            //return _context.RecordVideos.Any(e => e.status == status);
-        }
+       
 
         [HttpGet("{id}")]
         public ActionResult<Admin> Get(int id)
