@@ -20,7 +20,6 @@ namespace live.Controllers
         }
 
 
-
         [HttpGet("{id}")]
         public ActionResult<Admin> Get(int id)
         {
