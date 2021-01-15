@@ -24,6 +24,7 @@ namespace live.Controllers
         {
             return _context.Users.Any(e => e.id == id);
         }
+
         public bool UserNameExists(string name)
         {
             return _context.Users.Any(e => e.name == name);
@@ -33,6 +34,44 @@ namespace live.Controllers
         public ActionResult<Admin> Get(int id)
         {
             return _context.Admins.Find(id);
+        }
+
+        //查询用户表
+        [HttpPost("UserInfoList")]
+        public JsonResult UserInfoList([FromBody] QueryParameters query)
+        {
+            int count = _context.Users.Count();
+            List<User> temp = new List<User>();
+            //初始化用户表
+            PageInfoList pageUsers = new PageInfoList();
+            pageUsers.items = temp;
+            pageUsers.count = count;
+            pageUsers.pageIndex = query.pageIndex;
+            pageUsers.pageSize = query.pageSize;
+            //查询
+            if (query.pageIndex <= 0)
+            {
+                temp = (List<User>)_context.Users.Take(query.pageSize).ToList();
+                pageUsers.items = temp;
+                pageUsers.pageIndex = 1;
+            }
+            else if (query.pageSize * query.pageIndex > count)
+            {
+                temp = (List<User>)_context.Users.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                pageUsers.items = temp;
+            }
+            else
+            {
+                temp = _context.Users.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                pageUsers.items = temp;
+            }
+
+            ResultState resultState = new ResultState();
+            resultState.success = true;
+            resultState.code = 1;
+            resultState.message = "查询成功";
+            resultState.value = pageUsers;
+            return new JsonResult(resultState);
         }
 
 
@@ -125,8 +164,9 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-        //视频上下架
 
+
+        //管理员登录
         [HttpPost("login")]
         public JsonResult login(Admin admin)
         {
@@ -153,9 +193,9 @@ namespace live.Controllers
                 return new JsonResult(resultState);
             }
 
-
-
         }
+
+        //视频上下架
 
 
 
