@@ -20,7 +20,7 @@ namespace live.Controllers
             _context = context;
         }
 
-        // 获取数据库所有评论（供测试开发用）
+        // 获取数据库所有评论,无需参数（供测试开发用）
         [HttpGet("GetAllComments")]
         public JsonResult GetAllComments()
         {
@@ -74,10 +74,12 @@ namespace live.Controllers
         //判断评论是否包含敏感词
         private bool ContainSensitiveWord(Comment comment)
         {
-            var test = new List<string> { "1", "2", "3"};
-            foreach (string s in test)
+
+            var keywords = from k in _context.KeyWords select k.keyword;
+
+            foreach (string k in keywords)
             {
-                if (comment.content.Contains(s))
+                if (comment.content.Contains(k))
                     return true;
             }
 
