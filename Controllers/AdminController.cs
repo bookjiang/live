@@ -24,7 +24,10 @@ namespace live.Controllers
         {
             return _context.Users.Any(e => e.id == id);
         }
-
+        public bool UserNameExists(string name)
+        {
+            return _context.Users.Any(e => e.name == name);
+        }
 
         [HttpGet("{id}")]
         public ActionResult<Admin> Get(int id)
@@ -32,7 +35,8 @@ namespace live.Controllers
             return _context.Admins.Find(id);
         }
 
-        //api/Admin/3
+
+        //api/Admin/3  根据用户Id删除用户
         [HttpDelete("{userId}")]
         public async Task<ActionResult> DeleteUserByuserId(int userId)
         {
@@ -52,7 +56,76 @@ namespace live.Controllers
         }
 
 
+        //api/Admin/AddUser
+        [HttpPost("AddUser")]  //添加普通用户
+        public JsonResult AddUser(User user)
+        {
+            ResultState resultState = new ResultState();
+            if(UserNameExists(user.name))
+            {
+                resultState.message = "用户名已存在";
+                return new JsonResult(resultState);
+            }
+            _context.Users.Add(user);
+            _context.SaveChanges();
+            resultState.success = true;
+            resultState.code = 1;
+            resultState.message = "添加用户成功";
+            resultState.value = user;
+            return new JsonResult(resultState);
+        }
 
+        //api/Admin/AddAdmin
+        [HttpPost("AddAdmin")]  //添加管理员用户
+        public JsonResult AddAdmin(User Admin)
+        {
+            ResultState resultState = new ResultState();
+            if (UserNameExists(Admin.name))
+            {
+                resultState.message = "用户名已存在";
+                return new JsonResult(resultState);
+            }
+            _context.Users.Add(Admin);
+            _context.SaveChanges();
+            resultState.success = true;
+            resultState.code = 1;
+            resultState.message = "添加管理员成功";
+            resultState.value = Admin;
+            return new JsonResult(resultState);
+        }
+
+        //api/Admin/ModifyUserByUser  //修改用户
+        [HttpPut]
+        public JsonResult ModifyUserByUser(User user)
+        {           
+            ResultState resultState = new ResultState();
+            var user1 = _context.Users.Find(user.id);
+            if(user.name == user1.name& user.tel == user1.tel&user.id_no == user1.id_no & user.role == user1.role & user.psd == user1.psd)
+            {
+                resultState.message = "未做任何修改";
+                return new JsonResult(resultState);
+            }
+            else if(user.name != user1.name&UserNameExists(user.name))
+            {
+                resultState.message = "用户名已存在 请重新设定";
+                resultState.value = user1;
+                return new JsonResult(resultState);
+            }  
+            //修改用户信息
+            user1.name = user.name;
+            user1.id_no = user.id_no;
+            user1.tel = user.tel;
+            user1.role = user.role;
+            user1.psd = user.psd;
+            _context.SaveChanges();
+            resultState.success = true;
+            resultState.message = "修改成功";
+            resultState.code = 1;
+            resultState.value = user;
+            return new JsonResult(resultState);
+        }
+
+        //视频上下架
 
         [HttpPost("login")]
         public JsonResult login(Admin admin)
@@ -81,16 +154,6 @@ namespace live.Controllers
             }
 
 
-        }
-
-
-
-
-
-
-        public bool UserNameExists(string name)
-        {
-            return _context.Admins.Any(e => e.name == name);
         }
 
 
