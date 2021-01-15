@@ -6,18 +6,16 @@ using System.Threading.Tasks;
 
 namespace live.Models
 {
-    public class RecordVideo
+    public class Keyword
     {
-        public RecordVideo()
+        public Keyword()
         {
 
         }
+
         [Key]
         public int id { get; set; }
-        public int auchor_id { get; set; }
-        public int status { get; set; }
-        public string catagory { get; set; }
         public string keyword { get; set; }
-
+        public string operation { get; set; }
     }
 }
