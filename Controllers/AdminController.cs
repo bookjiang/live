@@ -56,12 +56,6 @@ namespace live.Controllers
 
 
         }
-
-
-
-
-
-
         public bool UserNameExists(string name)
         {
             return _context.Admins.Any(e => e.name == name);
