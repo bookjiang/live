@@ -25,11 +25,6 @@ namespace live.Controllers
             return _context.Users.Any(e => e.id == id);
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Admin>>> GetUsers()
-        {
-            return await _context.Admins.ToListAsync();
-        }
 
         [HttpGet("{id}")]
         public ActionResult<Admin> Get(int id)
@@ -87,6 +82,11 @@ namespace live.Controllers
 
 
         }
+
+
+
+
+
 
         public bool UserNameExists(string name)
         {
