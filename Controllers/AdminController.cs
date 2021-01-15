@@ -52,12 +52,6 @@ namespace live.Controllers
                 return new JsonResult(resultState);
             }
         }
-
-
-
-
-
-
         public bool UserNameExists(string name)
         {
             return _context.Admins.Any(e => e.name == name);

@@ -223,6 +223,55 @@ namespace live.Controllers
 
 
 
+        [HttpPost("userInfoList")]
+        public JsonResult list([FromBody] QueryParameters query)
+        {
+            int count = _context.Users.Count();
+            int pageSize1 = query.pageSize;
+            List<User> temp = new List<User>();
+            PageInfoList pageUsers = new PageInfoList();
+            if (query.pageIndex<=0)
+            {
+                 temp = (List<User>)_context.Users.Take(query.pageSize).ToList();
+                pageUsers.items = temp;
+                pageUsers.count = count;
+                pageUsers.pageIndex = 1;
+                pageUsers.pageSize = query.pageSize;
+            }
+            else if(query.pageSize * query.pageIndex >count)
+            {
+                 temp = (List<User>)_context.Users.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                pageUsers.items = temp;
+                pageUsers.count = count;
+                pageUsers.pageIndex = count / query.pageSize;
+                pageUsers.pageSize = query.pageSize;
+            }
+            else
+            {
+                 temp = _context.Users.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                pageUsers.items = temp;
+                pageUsers.count = count;
+                pageUsers.pageIndex = query.pageIndex;
+                pageUsers.pageSize = query.pageSize;
+            }
+
+            //PageInfoList<User> pageUsers = new PageInfoList<User>(temp, count, query.pageIndex, query.pageSize);
+            //pageUsers.items = temp;
+            //pageUsers.count = count;
+            //pageUsers.pageIndex = query.pageIndex;
+            //pageUsers.pageSize = query.pageSize;
+            ResultState resultState = new ResultState();
+            resultState.success = true;
+            resultState.message = "查询成功";
+            resultState.value = pageUsers;
+            return new JsonResult(resultState);
+
+
+        }
+
+
+
+
 
 
 
