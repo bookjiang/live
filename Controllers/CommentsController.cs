@@ -111,26 +111,55 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-        // 查询评论（待扩展分页操作）
-        [HttpGet("GetComments")]
-        public JsonResult GetComments(RecordVideo recordVideo)
+        // 查询分页评论
+        [HttpPost("GetComments")]
+        public JsonResult GetComments(VideoAndPage videoAndPage)
         {
-
+            //拆包两个对象
+            var recordVideo = videoAndPage.RecordVideo;
+            var query = videoAndPage.QueryParameters;
             ResultState resultState = new ResultState();
             var comments = from c in _context.Comments select c;
-            if (comments == null)
-            {
-                resultState.success = false;
-                resultState.message = "未获取评论列表";
-                resultState.value = recordVideo;
-                return new JsonResult(resultState);
-            }
-
+            //查询评论
+    
             comments = comments.Where(c => c.video_id == recordVideo.id);
+
+            int count = _context.Comments.Count();
+
+            int pageSize1 = query.pageSize;
+            List<Comment> temp = new List<Comment>();
+            PageInfoList pageComments = new PageInfoList();
+            //分页操作
+            if (query.pageIndex <= 0)
+            {
+                temp = comments.Take(query.pageSize).ToList();
+                pageComments.items = temp;
+                pageComments.count = count;
+                pageComments.pageIndex = 1;
+                pageComments.pageSize = query.pageSize;
+            }
+            else if (query.pageSize * query.pageIndex > count)
+            {
+                temp = comments.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                pageComments.items = temp;
+                pageComments.count = count;
+                pageComments.pageIndex = count / query.pageSize;
+                pageComments.pageSize = query.pageSize;
+            }
+            else
+            {
+                temp = comments.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                pageComments.items = temp;
+                pageComments.count = count;
+                pageComments.pageIndex = query.pageIndex;
+                pageComments.pageSize = query.pageSize;
+            }
+ 
             resultState.success = true;
             resultState.code = 1;
             resultState.message = "获取成功";
-            resultState.value = comments.ToArray();
+            resultState.value = pageComments;
+
             return new JsonResult(resultState);
         }
     }
