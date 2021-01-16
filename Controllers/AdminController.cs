@@ -51,9 +51,6 @@ namespace live.Controllers
                 resultState.message = "密码错误";
                 return new JsonResult(resultState);
             }
-
-
-
         }
         private bool UserNameExists(string name)
         {

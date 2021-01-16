@@ -19,8 +19,33 @@ namespace live.Controllers
         {
             _context = context;
         }
-        
-        //删除评论
+
+        // 获取数据库所有评论（供测试开发用）
+        [HttpGet("GetAllComments")]
+        public JsonResult GetAllComments()
+        {
+
+            ResultState resultState = new ResultState();
+            var comments = _context.Comments.ToArray();
+            if (comments == null)
+            {
+                resultState.success = false;
+                resultState.message = "未获取评论列表";
+                return new JsonResult(resultState);
+            }
+
+            
+            resultState.success = true;
+            resultState.code = 1;
+            resultState.message = "获取成功";
+            resultState.value = comments;
+            return new JsonResult(resultState);
+        }
+
+
+
+        // 删除某条评论（管理员权限）
+
         [HttpPost("DeleteComment")]
         public JsonResult DeleteComment(Comment comment)
         {
@@ -46,19 +71,29 @@ namespace live.Controllers
 
         }
 
-        private bool CommentExists(int id)
+        //判断评论是否包含敏感词
+        private bool ContainSensitiveWord(Comment comment)
         {
-            return _context.Comments.Any(e => e.id == id);
+            var test = new List<string> { "1", "2", "3"};
+            foreach (string s in test)
+            {
+                if (comment.content.Contains(s))
+                    return true;
+            }
+
+
+            return false;
         }
 
-        //添加评论
+
+        // 添加评论
         [HttpPost("AddComment")]
         public JsonResult AddComment(Comment comment)
         {
             ResultState resultState = new ResultState();
-            //    bool IsIncludeSensitiveWord = false;    预留
+           
             
-            if (comment.content.Contains("敏感词"))       //判断敏感词
+            if (ContainSensitiveWord(comment)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            )       //判断敏感词
             {
                 resultState.success = false;
                 resultState.code = 0;
@@ -66,7 +101,7 @@ namespace live.Controllers
                 resultState.value = comment;
                 return new JsonResult(resultState);
             }
-
+             
             _context.Comments.Add(comment);
             _context.SaveChanges();
             resultState.success = true;
@@ -76,26 +111,55 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-        //通过视频这个对象查询该视频的所有评论
-        [HttpGet("GetComments")]
-        public JsonResult GetComments(RecordVideo recordVideo)
+        // 查询分页评论
+        [HttpPost("GetComments")]
+        public JsonResult GetComments(VideoAndPage videoAndPage)
         {
-
+            //拆包两个对象
+            var recordVideo = videoAndPage.RecordVideo;
+            var query = videoAndPage.QueryParameters;
             ResultState resultState = new ResultState();
             var comments = from c in _context.Comments select c;
-            if (comments == null)
-            {
-                resultState.success = false;
-                resultState.message = "未获取评论列表";
-                resultState.value = recordVideo;
-                return new JsonResult(resultState);
-            }
-
+            //查询评论
+    
             comments = comments.Where(c => c.video_id == recordVideo.id);
+
+            int count = _context.Comments.Count();
+
+            int pageSize1 = query.pageSize;
+            List<Comment> temp = new List<Comment>();
+            PageInfoList pageComments = new PageInfoList();
+            //分页操作
+            if (query.pageIndex <= 0)
+            {
+                temp = comments.Take(query.pageSize).ToList();
+                pageComments.items = temp;
+                pageComments.count = count;
+                pageComments.pageIndex = 1;
+                pageComments.pageSize = query.pageSize;
+            }
+            else if (query.pageSize * query.pageIndex > count)
+            {
+                temp = comments.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                pageComments.items = temp;
+                pageComments.count = count;
+                pageComments.pageIndex = count / query.pageSize;
+                pageComments.pageSize = query.pageSize;
+            }
+            else
+            {
+                temp = comments.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                pageComments.items = temp;
+                pageComments.count = count;
+                pageComments.pageIndex = query.pageIndex;
+                pageComments.pageSize = query.pageSize;
+            }
+ 
             resultState.success = true;
             resultState.code = 1;
             resultState.message = "获取成功";
-            resultState.value = comments.ToArray();
+            resultState.value = pageComments;
+
             return new JsonResult(resultState);
         }
     }
