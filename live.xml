@@ -6,7 +6,7 @@
     <members>
         <member name="M:live.Controllers.UsersController.register(live.Models.User)">
             <summary>
-            用户注册1
+            用户注册
             </summary>
             <param name="user">User</param>
             <returns></returns>
@@ -16,6 +16,20 @@
             用户登录
             </summary>
             <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.UsersController.updateInfo(live.Models.User)">
+            <summary>
+            用户信息更新
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.UsersController.userInfoList(live.Models.QueryParameters)">
+            <summary>
+            获取用户列表
+            </summary>
+            <param name="query"></param>
             <returns></returns>
         </member>
         <member name="T:live.Models.User">
