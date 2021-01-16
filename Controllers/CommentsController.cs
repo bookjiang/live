@@ -20,7 +20,10 @@ namespace live.Controllers
             _context = context;
         }
 
-        // 获取数据库所有评论,无需参数（供测试开发用）
+        /// <summary>
+        /// 获取数据库中的所有评论
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("GetAllComments")]
         public JsonResult GetAllComments()
         {
@@ -30,23 +33,27 @@ namespace live.Controllers
             
             resultState.success = true;
             resultState.code = 1;
-            resultState.message = "获取成功";
+            resultState.message = "获取所有评论成功";
             resultState.value = comments;
             return new JsonResult(resultState);
         }
 
 
 
-        // 删除某条评论（管理员权限）
+        
+        /// <summary>
+        /// 删除评论
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <returns></returns>
         [HttpPost("DeleteComment")]
         public JsonResult DeleteComment(Comment comment)
         {
             ResultState resultState = new ResultState();
-            var newComment = _context.Comments.Where(c => c.id == comment.id).FirstOrDefault();
+            var newComment = _context.Comments.Where(c => c.user_name == comment.user_name).FirstOrDefault();
             if (newComment == null)    //数据库中未找到该条评论，删除失败
             {
                 resultState.success = false;
-                resultState.code = 0;
                 resultState.message = "删除评论失败！";
                 resultState.value = comment;
                 return new JsonResult(resultState);
@@ -57,7 +64,7 @@ namespace live.Controllers
 
             resultState.success = true;
             resultState.code = 1;
-            resultState.message = "删除成功";
+            resultState.message = "删除评论成功";
             resultState.value = newComment;
             return new JsonResult(resultState);
 
@@ -78,7 +85,11 @@ namespace live.Controllers
             return false;
         }
 
-        // 添加评论
+        /// <summary>
+        /// 添加一条评论
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <returns></returns>
         [HttpPost("AddComment")]
         public JsonResult AddComment(Comment comment)
         {
@@ -103,7 +114,12 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-        // 查询评论(分页)
+        
+        /// <summary>
+        /// 查询分页评论
+        /// </summary>
+        /// <param name="videoAndPage"></param>
+        /// <returns></returns>
         [HttpPost("GetComments")]
         public JsonResult GetComments(VideoAndPage videoAndPage)
         {
