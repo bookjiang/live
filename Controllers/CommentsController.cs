@@ -26,14 +26,7 @@ namespace live.Controllers
         {
 
             ResultState resultState = new ResultState();
-            var comments = _context.Comments.ToArray();
-            if (comments == null)
-            {
-                resultState.success = false;
-                resultState.message = "未获取评论列表";
-                return new JsonResult(resultState);
-            }
-
+            var comments = _context.Comments.ToList();
             
             resultState.success = true;
             resultState.code = 1;
@@ -45,12 +38,11 @@ namespace live.Controllers
 
 
         // 删除某条评论（管理员权限）
-
         [HttpPost("DeleteComment")]
         public JsonResult DeleteComment(Comment comment)
         {
             ResultState resultState = new ResultState();
-            var newComment = _context.Comments.Find(comment.id);
+            var newComment = _context.Comments.Where(c => c.id == comment.id).FirstOrDefault();
             if (newComment == null)    //数据库中未找到该条评论，删除失败
             {
                 resultState.success = false;
@@ -66,7 +58,7 @@ namespace live.Controllers
             resultState.success = true;
             resultState.code = 1;
             resultState.message = "删除成功";
-            resultState.value = comment;
+            resultState.value = newComment;
             return new JsonResult(resultState);
 
         }
@@ -83,10 +75,8 @@ namespace live.Controllers
                     return true;
             }
 
-
             return false;
         }
-
 
         // 添加评论
         [HttpPost("AddComment")]
@@ -113,23 +103,23 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-        // 查询分页评论
+        // 查询评论(分页)
         [HttpPost("GetComments")]
         public JsonResult GetComments(VideoAndPage videoAndPage)
         {
             //拆包两个对象
             var recordVideo = videoAndPage.RecordVideo;
             var query = videoAndPage.QueryParameters;
+
             ResultState resultState = new ResultState();
+
             var comments = from c in _context.Comments select c;
-            //查询评论
-    
             comments = comments.Where(c => c.video_id == recordVideo.id);
 
-            int count = _context.Comments.Count();
+            var count = comments.Count();
 
             int pageSize1 = query.pageSize;
-            List<Comment> temp = new List<Comment>();
+            var temp = new List<Comment>();
             PageInfoList pageComments = new PageInfoList();
             //分页操作
             if (query.pageIndex <= 0)
@@ -159,7 +149,7 @@ namespace live.Controllers
  
             resultState.success = true;
             resultState.code = 1;
-            resultState.message = "获取成功";
+            resultState.message = "获取评论列表成功";
             resultState.value = pageComments;
 
             return new JsonResult(resultState);
