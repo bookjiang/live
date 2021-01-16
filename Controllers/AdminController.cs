@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace live.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class AdminController : ControllerBase
     {
@@ -55,7 +55,7 @@ namespace live.Controllers
 
 
         }
-        public bool UserNameExists(string name)
+        private bool UserNameExists(string name)
         {
             return _context.Admins.Any(e => e.name == name);
         }

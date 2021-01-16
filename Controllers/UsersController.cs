@@ -106,11 +106,10 @@ namespace live.Controllers
             return _context.Users.Any(e => e.id == id);
         }
 
-        public bool UserNameExists(string name)
+        private bool UserNameExists(string name)
         {
             return _context.Users.Any(e => e.name == name);
         }
-
 
 
 
@@ -147,6 +146,7 @@ namespace live.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost("login")]
+        //用户登录
         public JsonResult login(User user)
         {
             ResultState resultState = new ResultState();
@@ -224,7 +224,7 @@ namespace live.Controllers
 
 
         [HttpPost("userInfoList")]
-        public JsonResult list([FromBody] QueryParameters query)
+        public JsonResult userInfoList([FromBody] QueryParameters query)
         {
             int count = _context.Users.Count();
             int pageSize1 = query.pageSize;

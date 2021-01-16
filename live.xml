@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>live</name>
+    </assembly>
+    <members>
+        <member name="M:live.Controllers.UsersController.register(live.Models.User)">
+            <summary>
+            用户注册
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.UsersController.login(live.Models.User)">
+            <summary>
+            用户登录
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
