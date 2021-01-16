@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using MySQL.Data.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Text.Json;
+using System.IO;
 
 namespace live
 {
@@ -25,11 +27,26 @@ namespace live
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
             services.AddDbContext<LiveMultiContext>(opt =>
             {
                 opt.UseMySQL(Configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddControllers();
+            //添加swagger
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "My API ", Version = "v1" });
+                
+                //var filePath = Path.Combine(System.AppContext.BaseDirectory, "live.xml");
+                var filePath = Path.Combine(System.Environment.CurrentDirectory, "live.xml");
+
+                c.IncludeXmlComments(filePath);
+
+
+            });
+
+            //services.AddSwaggerGenNewtonsoftSupport();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,6 +56,14 @@ namespace live
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            //添加Swagger有关中间件
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
+
+            });
 
             app.UseRouting(); 
             
