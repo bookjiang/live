@@ -6,9 +6,9 @@
     <members>
         <member name="M:live.Controllers.UsersController.register(live.Models.User)">
             <summary>
-            用户注册
+            用户注册1
             </summary>
-            <param name="user"></param>
+            <param name="user">User</param>
             <returns></returns>
         </member>
         <member name="M:live.Controllers.UsersController.login(live.Models.User)">
@@ -17,6 +17,46 @@
             </summary>
             <param name="user"></param>
             <returns></returns>
+        </member>
+        <member name="T:live.Models.User">
+            <summary>
+            User类
+            </summary>
+        </member>
+        <member name="M:live.Models.User.#ctor">
+            <summary>
+            构造函数
+            </summary>
+        </member>
+        <member name="P:live.Models.User.id">
+            <summary>
+            主键
+            </summary>
+        </member>
+        <member name="P:live.Models.User.name">
+            <summary>
+            姓名
+            </summary>
+        </member>
+        <member name="P:live.Models.User.tel">
+            <summary>
+            电话号码
+            </summary>
+        </member>
+        <member name="P:live.Models.User.id_no">
+            <summary>
+            身份证号
+            </summary>
+        </member>
+        <member name="P:live.Models.User.role">
+            <summary>
+            权限
+            </summary>
+        </member>
+        <member name="P:live.Models.User.psd">
+            <summary>
+            密码
+            </summary>
         </member>
     </members>
 </doc>

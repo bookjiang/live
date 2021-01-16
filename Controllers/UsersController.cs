@@ -40,7 +40,7 @@ namespace live.Controllers
 
             return user;
         }
-
+        
         // PUT: api/Users/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
@@ -116,10 +116,10 @@ namespace live.Controllers
         /// <summary>
         /// 用户注册
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="user">User</param>
         /// <returns></returns>
         [HttpPost("logon")]
-        public JsonResult register(User user)
+        public JsonResult register([FromBody]User user)
         {
             ResultState resultState = new ResultState();
             if (UserNameExists(user.name))
@@ -147,7 +147,7 @@ namespace live.Controllers
         /// <returns></returns>
         [HttpPost("login")]
         //用户登录
-        public JsonResult login(User user)
+        public JsonResult login([FromBody] User user)
         {
             ResultState resultState = new ResultState();
             if (!UserNameExists(user.name))
@@ -175,8 +175,13 @@ namespace live.Controllers
 
         }
 
+        /// <summary>
+        /// 用户信息更新
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         [HttpPut("updateInfo")]
-        public JsonResult updateInfo(User user)
+        public JsonResult updateInfo([FromBody] User user)
         {
             ResultState resultState = new ResultState();
             if (!UserExists(user.id))
@@ -222,7 +227,11 @@ namespace live.Controllers
 
 
 
-
+        /// <summary>
+        /// 获取用户列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         [HttpPost("userInfoList")]
         public JsonResult userInfoList([FromBody] QueryParameters query)
         {
