@@ -59,6 +59,7 @@ namespace live.Controllers
             {
                 temp = (List<User>)_context.Users.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
                 pageUsers.items = temp;
+                pageUsers.pageIndex = count / query.pageSize + 1;
             }
             else
             {
