@@ -13,6 +13,7 @@ using MySQL.Data.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 using System.IO;
+using Microsoft.AspNetCore.Cors;
 
 namespace live
 {
@@ -84,8 +85,7 @@ namespace live
                 app.UseDeveloperExceptionPage();
             }
 
-            //设置cors
-            app.UseCors("any");
+
 
             //添加Swagger有关中间件
             app.UseSwagger();
@@ -95,8 +95,10 @@ namespace live
 
             });
 
-            app.UseRouting(); 
-            
+            app.UseRouting();
+            //设置cors,//主要就是这两行，但是要注意，这一行要在app.UseRouting 和 UseEndpoints 之间
+            app.UseCors("any");
+            //app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

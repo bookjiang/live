@@ -59,6 +59,13 @@
             <param name="query"></param>
             <returns></returns>
         </member>
+        <member name="M:live.Controllers.UsersController.delete(System.Int32)">
+            <summary>
+            删除用户
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:live.Models.User">
             <summary>
             User类
