@@ -4,6 +4,33 @@
         <name>live</name>
     </assembly>
     <members>
+        <member name="M:live.Controllers.CommentsController.GetAllComments">
+            <summary>
+            获取数据库中的所有评论
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.CommentsController.DeleteComment(live.Models.Comment)">
+            <summary>
+            删除评论
+            </summary>
+            <param name="comment"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.CommentsController.AddComment(live.Models.Comment)">
+            <summary>
+            添加一条评论
+            </summary>
+            <param name="comment"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.CommentsController.GetComments(live.Models.VideoAndPage)">
+            <summary>
+            查询分页评论
+            </summary>
+            <param name="videoAndPage"></param>
+            <returns></returns>
+        </member>
         <member name="M:live.Controllers.UsersController.register(live.Models.User)">
             <summary>
             用户注册

@@ -32,6 +32,33 @@ namespace live
                 opt.UseMySQL(Configuration.GetConnectionString("DefaultConnection"));
             });
             services.AddControllers();
+
+            ////设置跨域处理
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy("any", builder =>
+            //    {
+            //        builder.AllowAnyOrigin()//允许任何来源的主机访问
+            //        .AllowAnyMethod()
+            //        .AllowAnyHeader()
+            //        .AllowCredentials();//指定处理cookie
+
+            //    });
+            //});
+            //注意：.net Core 3.1版本  Cors配置不能同时启用  AllowAnyOrigin()  .AllowAnyMethod()  .AllowAnyHeader()  .AllowCredentials()
+
+            //添加cors 服务 配置跨域处理   
+            services.AddCors(options =>
+            {
+                options.AddPolicy("any", builder =>
+                {
+                    builder.WithMethods("GET", "POST", "HEAD", "PUT", "DELETE", "OPTIONS")
+                    //.AllowCredentials()//指定处理cookie
+                .AllowAnyOrigin(); //允许任何来源的主机访问
+                });
+            });
+
+
             //添加swagger
             services.AddSwaggerGen(c =>
             {
@@ -56,6 +83,9 @@ namespace live
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            //设置cors
+            app.UseCors("any");
 
             //添加Swagger有关中间件
             app.UseSwagger();

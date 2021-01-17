@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using live.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Cors;
 
 namespace live.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("any")]
     public class UsersController : ControllerBase
     {
         private  LiveMultiContext _context;
