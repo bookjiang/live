@@ -19,5 +19,9 @@ namespace live.Models
         public string catagory { get; set; }
         public string keyword { get; set; }
 
+        public string url { get; set; }
+
     }
 }
+
+

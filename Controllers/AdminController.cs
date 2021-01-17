@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace live.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class AdminController : ControllerBase
     {

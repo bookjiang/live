@@ -20,41 +20,40 @@ namespace live.Controllers
             _context = context;
         }
 
-        // 获取数据库所有评论（供测试开发用）
+        /// <summary>
+        /// 获取数据库中的所有评论
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("GetAllComments")]
         public JsonResult GetAllComments()
         {
 
             ResultState resultState = new ResultState();
-            var comments = _context.Comments.ToArray();
-            if (comments == null)
-            {
-                resultState.success = false;
-                resultState.message = "未获取评论列表";
-                return new JsonResult(resultState);
-            }
-
+            var comments = _context.Comments.ToList();
             
             resultState.success = true;
             resultState.code = 1;
-            resultState.message = "获取成功";
+            resultState.message = "获取所有评论成功";
             resultState.value = comments;
             return new JsonResult(resultState);
         }
 
 
 
-        // 删除某条评论（管理员权限）
-
+        
+        /// <summary>
+        /// 删除评论
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <returns></returns>
         [HttpPost("DeleteComment")]
         public JsonResult DeleteComment(Comment comment)
         {
             ResultState resultState = new ResultState();
-            var newComment = _context.Comments.Find(comment.id);
+            var newComment = _context.Comments.Where(c => c.user_name == comment.user_name).FirstOrDefault();
             if (newComment == null)    //数据库中未找到该条评论，删除失败
             {
                 resultState.success = false;
-                resultState.code = 0;
                 resultState.message = "删除评论失败！";
                 resultState.value = comment;
                 return new JsonResult(resultState);
@@ -65,8 +64,8 @@ namespace live.Controllers
 
             resultState.success = true;
             resultState.code = 1;
-            resultState.message = "删除成功";
-            resultState.value = comment;
+            resultState.message = "删除评论成功";
+            resultState.value = newComment;
             return new JsonResult(resultState);
 
         }
@@ -74,19 +73,23 @@ namespace live.Controllers
         //判断评论是否包含敏感词
         private bool ContainSensitiveWord(Comment comment)
         {
-            var test = new List<string> { "1", "2", "3"};
-            foreach (string s in test)
+
+            var keywords = from k in _context.KeyWords select k.keyword;
+
+            foreach (string k in keywords)
             {
-                if (comment.content.Contains(s))
+                if (comment.content.Contains(k))
                     return true;
             }
-
 
             return false;
         }
 
-
-        // 添加评论
+        /// <summary>
+        /// 添加一条评论
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <returns></returns>
         [HttpPost("AddComment")]
         public JsonResult AddComment(Comment comment)
         {
@@ -111,23 +114,28 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-        // 查询分页评论
+        
+        /// <summary>
+        /// 查询分页评论
+        /// </summary>
+        /// <param name="videoAndPage"></param>
+        /// <returns></returns>
         [HttpPost("GetComments")]
         public JsonResult GetComments(VideoAndPage videoAndPage)
         {
             //拆包两个对象
             var recordVideo = videoAndPage.RecordVideo;
             var query = videoAndPage.QueryParameters;
+
             ResultState resultState = new ResultState();
+
             var comments = from c in _context.Comments select c;
-            //查询评论
-    
             comments = comments.Where(c => c.video_id == recordVideo.id);
 
-            int count = _context.Comments.Count();
+            var count = comments.Count();
 
             int pageSize1 = query.pageSize;
-            List<Comment> temp = new List<Comment>();
+            var temp = new List<Comment>();
             PageInfoList pageComments = new PageInfoList();
             //分页操作
             if (query.pageIndex <= 0)
@@ -157,7 +165,7 @@ namespace live.Controllers
  
             resultState.success = true;
             resultState.code = 1;
-            resultState.message = "获取成功";
+            resultState.message = "获取评论列表成功";
             resultState.value = pageComments;
 
             return new JsonResult(resultState);
