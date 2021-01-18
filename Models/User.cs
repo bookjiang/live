@@ -44,5 +44,10 @@ namespace live.Models
         /// 密码
         /// </summary>
         public string psd { get; set; }
+        /// <summary>
+        /// 状态 0表示禁言
+        /// </summary>
+        public int status { get; set; }
+        
     }
 }
