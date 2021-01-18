@@ -45,20 +45,20 @@ namespace live.Controllers
 
         
         /// <summary>
-        /// 删除一条评论
+        /// 删除评论
         /// </summary>
-        /// <param name="comment">需一条Comment类型的json对象作为参数，其中的id属性不能缺失</param>
+        /// <param name="id">评论的id属性值</param>
         /// <returns></returns>
-        [HttpDelete("DeleteComment")]
-        public JsonResult DeleteComment(Comment comment)
+        [HttpDelete("DeleteComment/{id}")]
+        public JsonResult DeleteComment(int id)
         {
             ResultState resultState = new ResultState();
-            var newComment = _context.Comments.Where(c => c.id == comment.id).FirstOrDefault();
+            var newComment = _context.Comments.Where(c => c.id == id).FirstOrDefault();
             if (newComment == null)    //数据库中未找到该条评论，删除失败
             {
                 resultState.success = false;
                 resultState.message = "删除评论失败！";
-                resultState.value = comment;
+                resultState.value = newComment;
                 return new JsonResult(resultState);
             }
             
