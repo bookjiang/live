@@ -49,7 +49,7 @@ namespace live.Controllers
         /// </summary>
         /// <param name="comment">需一条Comment类型的json对象作为参数，其中的id属性不能缺失</param>
         /// <returns></returns>
-        [HttpPost("DeleteComment")]
+        [HttpDelete("DeleteComment")]
         public JsonResult DeleteComment(Comment comment)
         {
             ResultState resultState = new ResultState();
@@ -123,7 +123,7 @@ namespace live.Controllers
         /// </summary>
         /// <param name="videoAndPage">需要一个VideoAndPage类型的json对象,该类型由RecordVideo类型和QueryParameters类型组合为一个json对象</param>
         /// <returns></returns>
-        [HttpPost("GetComments")]
+        [HttpGet("GetComments")]
         public JsonResult GetComments(VideoAndPage videoAndPage)
         {
             //拆包两个对象
