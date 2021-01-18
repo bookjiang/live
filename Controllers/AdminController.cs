@@ -377,7 +377,7 @@ namespace live.Controllers
         }
 
         //视频下架
-        public JsonResult VedioOffline()
+        private JsonResult VedioOffline()
         {
             var resultState = new ResultState();
             resultState.success = true;

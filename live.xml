@@ -4,31 +4,113 @@
         <name>live</name>
     </assembly>
     <members>
+        <member name="M:live.Controllers.AdminController.Get(System.Int32)">
+            <summary>
+            查询管理员
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.AdminController.UserInfoList(live.Models.QueryParameters)">
+            <summary>
+            查询用户表
+            </summary>
+            <param name="query"></param>
+            <returns></returns> 
+        </member>
+        <member name="M:live.Controllers.AdminController.DeleteUserByuserId(System.Int32)">
+            <summary>
+            根据用户Id删除用户
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>     
+        </member>
+        <member name="M:live.Controllers.AdminController.AddUser(live.Models.User)">
+            <summary>
+            添加普通用户
+            </summary>
+            <param name="user"></param>
+            <returns></returns>     
+        </member>
+        <member name="M:live.Controllers.AdminController.AddAdmin(live.Models.Admin)">
+            <summary>
+            添加管理员用户
+            </summary>
+            <param name="Admin"></param>
+            <returns></returns>       
+        </member>
+        <member name="M:live.Controllers.AdminController.ModifyUserByUser(live.Models.User)">
+            <summary>
+            修改用户信息
+            </summary>
+            <param name="user"></param>
+            <returns></returns>       
+        </member>
+        <member name="M:live.Controllers.AdminController.Login(live.Models.Admin)">
+            <summary>
+            管理员登录
+            </summary>
+            <param name="admin"></param>
+            <returns></returns>     
+        </member>
+        <member name="M:live.Controllers.AdminController.KeywordInfoList(live.Models.QueryParameters)">
+            <summary>
+            查询关键字表
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.AdminController.AddKeyword(live.Models.Keyword)">
+            <summary>
+            添加关键词
+            </summary>
+            <param name="keyword"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.AdminController.DeleteKeywordBykeywordId(System.Int32)">
+            <summary>
+            删除关键字
+            </summary>
+            <param name="keywordId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.AdminController.CommentInfoList(live.Models.QueryParameters)">
+            <summary>
+            查询评论总表
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="T:live.Controllers.CommentsController">
+            <summary>
+            Comments控制器，包含一些对评论的一些基本操作
+            </summary>
+        </member>
         <member name="M:live.Controllers.CommentsController.GetAllComments">
             <summary>
             获取数据库中的所有评论
             </summary>
             <returns></returns>
         </member>
-        <member name="M:live.Controllers.CommentsController.DeleteComment(live.Models.Comment)">
+        <member name="M:live.Controllers.CommentsController.DeleteComment(System.Int32)">
             <summary>
             删除评论
             </summary>
-            <param name="comment"></param>
+            <param name="id">评论的id属性值</param>
             <returns></returns>
         </member>
         <member name="M:live.Controllers.CommentsController.AddComment(live.Models.Comment)">
             <summary>
             添加一条评论
             </summary>
-            <param name="comment"></param>
+            <param name="comment">需一条评论json对象作为参数,无需id属性(tips:依靠数据库自动生产id的值)</param>
             <returns></returns>
         </member>
         <member name="M:live.Controllers.CommentsController.GetComments(live.Models.VideoAndPage)">
             <summary>
             查询分页评论
             </summary>
-            <param name="videoAndPage"></param>
+            <param name="videoAndPage">需要一个VideoAndPage类型的json对象,该类型由RecordVideo类型和QueryParameters类型组合为一个json对象</param>
             <returns></returns>
         </member>
         <member name="M:live.Controllers.UsersController.register(live.Models.User)">
@@ -104,6 +186,11 @@
         <member name="P:live.Models.User.psd">
             <summary>
             密码
+            </summary>
+        </member>
+        <member name="P:live.Models.User.status">
+            <summary>
+            状态 0表示禁言
             </summary>
         </member>
     </members>
