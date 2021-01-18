@@ -17,7 +17,9 @@ namespace live.Models
         public int user_id { get; set; }
         public string user_name { get; set; }
         public int video_id { get; set; }
+
         public string content { get; set; }
+        public string video_name { get; set; }
 
 
     }
