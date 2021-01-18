@@ -14,7 +14,7 @@ namespace live.Models
         }
         [Key]
         public int id { get; set; }
-        public int anchor_id { get; set; }
+        public int auchor_id { get; set; }
         public int status { get; set; }
         public string catagory { get; set; }
         public string keyword { get; set; }
