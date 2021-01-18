@@ -36,7 +36,11 @@ namespace live.Controllers
             return _context.Admins.Find(id);
         }
 
-        //查询用户表
+        /// <summary>
+        /// 查询用户表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         [HttpPost("UserInfoList")]
         public JsonResult UserInfoList([FromBody] QueryParameters query)
         {
@@ -75,8 +79,11 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-
-        //api/Admin/3  根据用户Id删除用户
+        /// <summary>
+        /// 根据用户Id删除用户
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>     
         [HttpDelete("{userId}")]
         public async Task<ActionResult> DeleteUserByuserId(int userId)
         {
@@ -95,9 +102,12 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-
-        //api/Admin/AddUser
-        [HttpPost("AddUser")]  //添加普通用户
+        /// <summary>
+        /// 添加普通用户
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>     
+        [HttpPost("AddUser")]  
         public JsonResult AddUser(User user)
         {
             ResultState resultState = new ResultState();
@@ -115,8 +125,12 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-        //api/Admin/AddAdmin
-        [HttpPost("AddAdmin")]  //添加管理员用户
+        /// <summary>
+        /// 添加管理员用户
+        /// </summary>
+        /// <param name="Admin"></param>
+        /// <returns></returns>       
+        [HttpPost("AddAdmin")]  
         public JsonResult AddAdmin(User Admin)
         {
             ResultState resultState = new ResultState();
@@ -134,7 +148,11 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-        //api/Admin/ModifyUserByUser  //修改用户
+        /// <summary>
+        /// 修改用户信息
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>       
         [HttpPut]
         public JsonResult ModifyUserByUser(User user)
         {           
@@ -166,8 +184,11 @@ namespace live.Controllers
         }
 
 
-
-        //管理员登录
+        /// <summary>
+        /// 管理员登录
+        /// </summary>
+        /// <param name="admin"></param>
+        /// <returns></returns>     
         [HttpPost("login")]
         public JsonResult login(Admin admin)
         {
@@ -196,7 +217,11 @@ namespace live.Controllers
 
         }
 
+      
+
         //视频上下架
+
+
 
 
 

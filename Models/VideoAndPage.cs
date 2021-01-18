@@ -8,7 +8,7 @@ namespace live.Models
     public class VideoAndPage
     {
         public VideoAndPage()
-        {
+        {s
                 
         }
         
