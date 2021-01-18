@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using live.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Cors;
 
 namespace live.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("any")]
     public class UsersController : ControllerBase
     {
         private  LiveMultiContext _context;
@@ -279,8 +281,32 @@ namespace live.Controllers
         }
 
 
+        /// <summary>
+        /// 删除用户
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("delete/{id}")]
+        public JsonResult delete(int id)
+        {
+            ResultState resultState = new ResultState();
+            var user =_context.Users.Find(id);
+            if (user == null)
+            {
+                resultState.success = false;
+                resultState.message = "用户不存在";
+                
+                return new JsonResult(resultState);
+            }
+
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+            resultState.success = true;
+            resultState.message = "删除成功";
 
 
+            return new JsonResult(resultState);
+        }
 
 
 

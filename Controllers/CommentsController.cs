@@ -9,6 +9,9 @@ using live.Models;
 
 namespace live.Controllers
 {
+    /// <summary>
+    /// Comments控制器，包含一些对评论的一些基本操作
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class CommentsController : ControllerBase
@@ -42,15 +45,15 @@ namespace live.Controllers
 
         
         /// <summary>
-        /// 删除评论
+        /// 删除一条评论
         /// </summary>
-        /// <param name="comment"></param>
+        /// <param name="comment">需一条Comment类型的json对象作为参数，其中的id属性不能缺失</param>
         /// <returns></returns>
         [HttpPost("DeleteComment")]
         public JsonResult DeleteComment(Comment comment)
         {
             ResultState resultState = new ResultState();
-            var newComment = _context.Comments.Where(c => c.user_name == comment.user_name).FirstOrDefault();
+            var newComment = _context.Comments.Where(c => c.id == comment.id).FirstOrDefault();
             if (newComment == null)    //数据库中未找到该条评论，删除失败
             {
                 resultState.success = false;
@@ -88,7 +91,7 @@ namespace live.Controllers
         /// <summary>
         /// 添加一条评论
         /// </summary>
-        /// <param name="comment"></param>
+        /// <param name="comment">需一条评论json对象作为参数,无需id属性(tips:依靠数据库自动生产id的值)</param>
         /// <returns></returns>
         [HttpPost("AddComment")]
         public JsonResult AddComment(Comment comment)
@@ -114,11 +117,11 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-        
+
         /// <summary>
         /// 查询分页评论
         /// </summary>
-        /// <param name="videoAndPage"></param>
+        /// <param name="videoAndPage">需要一个VideoAndPage类型的json对象,该类型由RecordVideo类型和QueryParameters类型组合为一个json对象</param>
         /// <returns></returns>
         [HttpPost("GetComments")]
         public JsonResult GetComments(VideoAndPage videoAndPage)

@@ -25,7 +25,7 @@ namespace live.Controllers
             return _context.Users.Any(e => e.id == id);
         }
 
-        public bool UserNameExists(string name)
+        private bool UserNameExists(string name)
         {
             return _context.Users.Any(e => e.name == name);
         }
