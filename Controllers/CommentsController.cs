@@ -24,20 +24,49 @@ namespace live.Controllers
         }
 
         /// <summary>
-        /// 获取数据库中的所有评论
+        /// 获取所有评论
         /// </summary>
+        /// <param name="query"></param>
         /// <returns></returns>
-        [HttpGet("GetAllComments")]
-        public JsonResult GetAllComments()
+        [HttpPost("GetAllComments")]
+        public JsonResult GetAllComments([FromBody] QueryParameters query)
         {
-
+           
             ResultState resultState = new ResultState();
             var comments = _context.Comments.ToList();
-            
+            var count = comments.Count();
+
+            PageInfoList pageComments = new PageInfoList();
+            List<Comment> temp;
+            if (query.pageIndex <= 0)
+            {
+                temp = comments.Take(query.pageSize).ToList();
+                pageComments.items = temp;
+                pageComments.count = count;
+                pageComments.pageIndex = 1;
+                pageComments.pageSize = query.pageSize;
+            }
+            else if (query.pageSize * query.pageIndex > count)
+            {
+                temp = comments.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                pageComments.items = temp;
+                pageComments.count = count;
+                pageComments.pageIndex = count / query.pageSize;
+                pageComments.pageSize = query.pageSize;
+            }
+            else
+            {
+                temp = comments.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                pageComments.items = temp;
+                pageComments.count = count;
+                pageComments.pageIndex = query.pageIndex;
+                pageComments.pageSize = query.pageSize;
+            }
+
             resultState.success = true;
             resultState.code = 1;
             resultState.message = "获取所有评论成功";
-            resultState.value = comments;
+            resultState.value = pageComments;
             return new JsonResult(resultState);
         }
 
@@ -73,7 +102,7 @@ namespace live.Controllers
 
         }
 
-        //判断评论是否包含敏感词
+        //判断评论是否包含敏感词(私有方法)
         private bool ContainSensitiveWord(Comment comment)
         {
 
@@ -94,7 +123,7 @@ namespace live.Controllers
         /// <param name="comment">需一条评论json对象作为参数,无需id属性(tips:依靠数据库自动生产id的值)</param>
         /// <returns></returns>
         [HttpPost("AddComment")]
-        public JsonResult AddComment(Comment comment)
+        public JsonResult AddComment([FromBody] Comment comment)
         {
             ResultState resultState = new ResultState();
            
@@ -119,7 +148,7 @@ namespace live.Controllers
 
 
         /// <summary>
-        /// 查询分页评论
+        /// 查询属于某视频评论
         /// </summary>
         /// <param name="videoAndPage">需要一个VideoAndPage类型的json对象,该类型由RecordVideo类型和QueryParameters类型组合为一个json对象</param>
         /// <returns></returns>
@@ -137,7 +166,6 @@ namespace live.Controllers
 
             var count = comments.Count();
 
-            int pageSize1 = query.pageSize;
             var temp = new List<Comment>();
             PageInfoList pageComments = new PageInfoList();
             //分页操作
