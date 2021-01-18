@@ -40,7 +40,7 @@ namespace live
                 //var filePath = Path.Combine(System.AppContext.BaseDirectory, "live.xml");
                 var filePath = Path.Combine(System.Environment.CurrentDirectory, "live.xml");
 
-                c.IncludeXmlComments(filePath);
+                c.IncludeXmlComments(filePath,true);
 
 
             });
