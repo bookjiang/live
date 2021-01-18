@@ -123,8 +123,8 @@ namespace live.Controllers
         /// </summary>
         /// <param name="videoAndPage">需要一个VideoAndPage类型的json对象,该类型由RecordVideo类型和QueryParameters类型组合为一个json对象</param>
         /// <returns></returns>
-        [HttpGet("GetComments")]
-        public JsonResult GetComments(VideoAndPage videoAndPage)
+        [HttpPost("GetComments")]
+        public JsonResult GetComments([FromBody] VideoAndPage videoAndPage)
         {
             //拆包两个对象
             var recordVideo = videoAndPage.RecordVideo;
