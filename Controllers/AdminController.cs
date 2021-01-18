@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace live.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AdminController : ControllerBase
     {
@@ -29,14 +29,27 @@ namespace live.Controllers
         {
             return _context.Users.Any(e => e.name == name);
         }
+        private bool KeywordExists(string keyword)
+        {
+            return _context.KeyWords.Any(e => e.keyword == keyword);
+        }
 
+        /// <summary>
+        /// 查询管理员
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public ActionResult<Admin> Get(int id)
         {
             return _context.Admins.Find(id);
         }
 
-        //查询用户表
+        /// <summary>
+        /// 查询用户表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns> 
         [HttpPost("UserInfoList")]
         public JsonResult UserInfoList([FromBody] QueryParameters query)
         {
@@ -66,8 +79,8 @@ namespace live.Controllers
                 temp = _context.Users.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
                 pageUsers.items = temp;
             }
-
-            ResultState resultState = new ResultState();
+            
+            var resultState = new ResultState();
             resultState.success = true;
             resultState.code = 1;
             resultState.message = "查询成功";
@@ -75,9 +88,12 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-
-        //api/Admin/3  根据用户Id删除用户
-        [HttpDelete("{userId}")]
+        /// <summary>
+        /// 根据用户Id删除用户
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>     
+        [HttpDelete("DeleteUser/{userId}")]
         public async Task<ActionResult> DeleteUserByuserId(int userId)
         {
             var user =await _context.Users.FindAsync(userId);
@@ -95,9 +111,12 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-
-        //api/Admin/AddUser
-        [HttpPost("AddUser")]  //添加普通用户
+        /// <summary>
+        /// 添加普通用户
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>     
+        [HttpPost("AddUser")]  
         public JsonResult AddUser(User user)
         {
             ResultState resultState = new ResultState();
@@ -115,8 +134,12 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-        //api/Admin/AddAdmin
-        [HttpPost("AddAdmin")]  //添加管理员用户
+        /// <summary>
+        /// 添加管理员用户
+        /// </summary>
+        /// <param name="Admin"></param>
+        /// <returns></returns>       
+        [HttpPost("AddAdmin")]  
         public JsonResult AddAdmin(User Admin)
         {
             ResultState resultState = new ResultState();
@@ -134,7 +157,11 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-        //api/Admin/ModifyUserByUser  //修改用户
+        /// <summary>
+        /// 修改用户信息
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>       
         [HttpPut]
         public JsonResult ModifyUserByUser(User user)
         {           
@@ -166,15 +193,17 @@ namespace live.Controllers
         }
 
 
-
-        //管理员登录
+        /// <summary>
+        /// 管理员登录
+        /// </summary>
+        /// <param name="admin"></param>
+        /// <returns></returns>     
         [HttpPost("login")]
-        public JsonResult login(Admin admin)
+        public JsonResult Login(Admin admin)
         {
             ResultState resultState = new ResultState();
             if (!UserNameExists(admin.name))
             {
-                resultState.success = false;
                 resultState.message = "用户名不存在";
                 return new JsonResult(resultState);
             }
@@ -183,20 +212,114 @@ namespace live.Controllers
             {
                 resultState.success = true;
                 resultState.message = "登录成功";
+                resultState.code = 1;
                 resultState.value = admin1;
                 return new JsonResult(resultState);
 
             }
             else
             {
-                resultState.success = false;
                 resultState.message = "用户名或密码错误";
                 return new JsonResult(resultState);
             }
 
         }
 
+        /// <summary>
+        /// 查询关键字表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpPost("KeywordInfoList")]
+        public JsonResult KeywordInfoList([FromBody] QueryParameters query)
+        {
+            int count = _context.KeyWords.Count();
+            List<Keyword> temp = new List<Keyword>();
+            //初始化关键词表
+            var pageKeywords = new PageInfoList();
+            pageKeywords.items = temp;
+            pageKeywords.count = count;
+            pageKeywords.pageIndex = query.pageIndex;
+            pageKeywords.pageSize = query.pageSize;
+            //查询
+            if (query.pageIndex <= 0)
+            {
+                temp = (List<Keyword>)_context.KeyWords.Take(query.pageSize).ToList();
+                pageKeywords.items = temp;
+                pageKeywords.pageIndex = 1;
+            }
+            else if (query.pageSize * query.pageIndex > count)
+            {
+                temp = (List<Keyword>)_context.KeyWords.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                pageKeywords.items = temp;
+                pageKeywords.pageIndex = count / query.pageSize + 1;
+            }
+            else
+            {
+                temp = _context.KeyWords.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                pageKeywords.items = temp;
+            }
+
+            var resultState = new ResultState();
+            resultState.success = true;
+            resultState.code = 1;
+            resultState.message = "查询成功";
+            resultState.value = pageKeywords;
+            return new JsonResult(resultState);
+        }
+
+
+        /// <summary>
+        /// 添加关键词
+        /// </summary>
+        /// <param name="keyword"></param>
+        /// <returns></returns>
+        [HttpPost("AddKeyword")]
+        public JsonResult AddKeyword([FromBody] Keyword keyword)
+        {
+            ResultState resultState = new ResultState();
+            if (KeywordExists(keyword.keyword))
+            {
+                resultState.message = "该关键词已录入";
+                return new JsonResult(resultState);
+            }
+            _context.KeyWords.Add(keyword);
+            _context.SaveChanges();
+            resultState.success = true;
+            resultState.message = "关键词添加成功";
+            resultState.code = 1;
+            return new JsonResult(resultState);
+        }
+
+        /// <summary>
+        /// 删除关键字
+        /// </summary>
+        /// <param name="keywordId"></param>
+        /// <returns></returns>
+        [HttpDelete("DeleteKeyword/{keywordId}")]
+        public async Task<ActionResult> DeleteKeywordBykeywordId(int keywordId)
+        {
+            var keyword = await _context.KeyWords.FindAsync(keywordId);
+            ResultState resultState = new ResultState();
+            _context.KeyWords.Remove(keyword);
+            await _context.SaveChangesAsync();
+            if (!UserExists(keyword.id))
+            {
+                resultState.success = true;
+                resultState.code = 1;
+                resultState.message = "成功删除";
+                return new JsonResult(resultState);
+            }
+            resultState.message = "删除失败";
+            return new JsonResult(resultState);
+        }
+
+
+
+
         //视频上下架
+
+
 
 
 
