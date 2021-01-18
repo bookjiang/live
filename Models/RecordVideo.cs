@@ -10,7 +10,7 @@ namespace live.Models
     {
         public RecordVideo()
         {
-
+            status = 0;
         }
         [Key]
         public int id { get; set; }

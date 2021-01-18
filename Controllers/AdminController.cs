@@ -140,7 +140,7 @@ namespace live.Controllers
         /// <param name="Admin"></param>
         /// <returns></returns>       
         [HttpPost("AddAdmin")]  
-        public JsonResult AddAdmin(User Admin)
+        public JsonResult AddAdmin(Admin Admin)
         {
             ResultState resultState = new ResultState();
             if (UserNameExists(Admin.name))
@@ -148,7 +148,7 @@ namespace live.Controllers
                 resultState.message = "用户名已存在";
                 return new JsonResult(resultState);
             }
-            _context.Users.Add(Admin);
+            _context.Admins.Add(Admin);
             _context.SaveChanges();
             resultState.success = true;
             resultState.code = 1;
@@ -162,17 +162,17 @@ namespace live.Controllers
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>       
-        [HttpPut]
+        [HttpPut("ModifyUserByUser")]
         public JsonResult ModifyUserByUser(User user)
         {           
             ResultState resultState = new ResultState();
             var user1 = _context.Users.Find(user.id);
-            if(user.name == user1.name& user.tel == user1.tel&user.id_no == user1.id_no & user.role == user1.role & user.psd == user1.psd)
+            if(user.name == user1.name && user.tel == user1.tel && user.id_no == user1.id_no && user.role == user1.role && user.psd == user1.psd && user.status == user1.status)
             {
                 resultState.message = "未做任何修改";
                 return new JsonResult(resultState);
             }
-            else if(user.name != user1.name&UserNameExists(user.name))
+            else if(user.name != user1.name && UserNameExists(user.name))
             {
                 resultState.message = "用户名已存在 请重新设定";
                 resultState.value = user1;
@@ -184,6 +184,7 @@ namespace live.Controllers
             user1.tel = user.tel;
             user1.role = user.role;
             user1.psd = user.psd;
+            user1.status = user.status;
             _context.SaveChanges();
             resultState.success = true;
             resultState.message = "修改成功";
@@ -314,13 +315,77 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
+        /// <summary>
+        /// 查询评论总表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpPost("CommentInfoList")]
+        public JsonResult CommentInfoList([FromBody] QueryParameters query)
+        {
+            int count = _context.Comments.Count();
+            List<Comment> temp = new List<Comment>();
+            //初始化关键词表
+            var pageComments = new PageInfoList();
+            pageComments.items = temp;
+            pageComments.count = count;
+            pageComments.pageIndex = query.pageIndex;
+            pageComments.pageSize = query.pageSize;
+            //查询
+            if (query.pageIndex <= 0)
+            {
+                temp = (List<Comment>)_context.Comments.Take(query.pageSize).ToList();
+                pageComments.items = temp;
+                pageComments.pageIndex = 1;
+            }
+            else if (query.pageSize * query.pageIndex > count)
+            {
+                temp = (List<Comment>)_context.Comments.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                pageComments.items = temp;
+                pageComments.pageIndex = count / query.pageSize + 1;
+            }
+            else
+            {
+                temp = _context.Comments.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                pageComments.items = temp;
+            }
 
+            var resultState = new ResultState();
+            resultState.success = true;
+            resultState.code = 1;
+            resultState.message = "查询成功";
+            resultState.value = pageComments;
+            return new JsonResult(resultState);
+        }
 
+        //视频上架
+        [HttpPut("VedioOnline/{vedioId}")]
+        public JsonResult VedioOnline(int vedioId)
+        {
+            RecordVideo recordVideo = _context.RecordVideos.Find(vedioId);
+            if (recordVideo.status == 0)
+            {
+                recordVideo.status = 1;
+                _context.SaveChanges();
+            }
+            var resultState = new ResultState();
+            resultState.success = true;
+            resultState.code = 1;
+            resultState.message = "查询成功";
 
-        //视频上下架
+            return new JsonResult(resultState);
+        }
 
+        //视频下架
+        private JsonResult VedioOffline()
+        {
+            var resultState = new ResultState();
+            resultState.success = true;
+            resultState.code = 1;
+            resultState.message = "";
 
-
+            return new JsonResult(resultState);
+        }
 
 
     }
