@@ -147,6 +147,27 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
+        /// <summary>
+        /// 通过id删除视频
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("DeleteFile/{id}")]
+        public JsonResult DeleteFile(int id)
+        {
+            
+            var video = _context.RecordVideos.FirstOrDefault(r => r.id == id);
+            if(video == null)
+            {
+                return  new JsonResult(new ResultState(false, "删除失败", 0, video));
+            }
+            _context.RecordVideos.Remove(video);
+            _context.SaveChanges();
+
+            
+            return new JsonResult(new ResultState(true, "删除成功", 1, video));
+
+        }
 
 
 

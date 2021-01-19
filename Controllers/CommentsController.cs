@@ -141,6 +141,7 @@ namespace live.Controllers
              
             _context.Comments.Add(comment);
             _context.SaveChanges();
+
             resultState.success = true;
             resultState.code = 1;
             resultState.message = "添加成功";
@@ -163,8 +164,8 @@ namespace live.Controllers
 
             ResultState resultState = new ResultState();
 
-            var comments = from c in _context.Comments select c;
-            comments = comments.Where(c => c.video_id == recordVideo.id);
+            
+            var comments =_context.Comments.Where(c => c.video_id == recordVideo.id).ToList();
 
             var count = comments.Count();
 
