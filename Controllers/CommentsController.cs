@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using live.Models;
+using Microsoft.AspNetCore.Cors;
 
 namespace live.Controllers
 {
@@ -14,6 +15,7 @@ namespace live.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("any")]
     public class CommentsController : ControllerBase
     {
         private readonly LiveMultiContext _context;
