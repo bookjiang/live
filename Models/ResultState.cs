@@ -14,6 +14,13 @@ namespace live.Models
             code = 0;
             value = "";
         }
+        public ResultState(bool success,string message, int code, object value)
+        {
+            this.success = success;
+            this.message = message;
+            this.code = code;
+            this.value = value;
+        }
         //返回操作成功与否
         public bool success { get; set; }
 

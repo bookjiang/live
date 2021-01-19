@@ -155,23 +155,17 @@ namespace live.Controllers
         [HttpDelete("DeleteFile/{id}")]
         public JsonResult DeleteFile(int id)
         {
-            ResultState resultState = new ResultState();
-            var video = _context.RecordVideos.FirstOrDefault(r=>r.id == id);
+            
+            var video = _context.RecordVideos.FirstOrDefault(r => r.id == id);
             if(video == null)
             {
-                resultState.success = false;
-                resultState.message = "删除失败";
-                resultState.value = id;
+                return  new JsonResult(new ResultState(false, "删除失败", 0, video));
             }
             _context.RecordVideos.Remove(video);
             _context.SaveChanges();
 
-            resultState.success = true;
-            resultState.message = "删除成功";
-            resultState.value = video;
-            resultState.code = 1;
-            return new JsonResult(resultState);
             
+            return new JsonResult(new ResultState(true, "删除成功", 1, video));
 
         }
 
