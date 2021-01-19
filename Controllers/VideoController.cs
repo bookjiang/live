@@ -18,7 +18,7 @@ namespace live.Controllers
     public class VideoController : ControllerBase
     {
         private LiveMultiContext _context;
-        private string _targetFilePath;
+        //private string _targetFilePath;
 
         public VideoController(LiveMultiContext context)
         {
@@ -92,8 +92,8 @@ namespace live.Controllers
                     // recordVideo.guid = Guid.NewGuid().ToString();
 
                     //string filePath = hostEnv.ContentRootPath + "/wwwroot/upload/" + recordVideo.guid + @"/";
-                    string filePath = "/usr/local/nginx/html/mp4";
-                    //string filePath = "E:\\";
+                    //string filePath = "/usr/local/nginx/html/mp4/";
+                    string filePath = "E:\\";
 
                     if (!Directory.Exists(filePath))
                     {

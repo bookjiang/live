@@ -81,15 +81,30 @@
             <param name="query"></param>
             <returns></returns>
         </member>
+        <member name="M:live.Controllers.AdminController.VedioOnline(System.Int32)">
+            <summary>
+            视频上架
+            </summary>
+            <param name="vedioId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.AdminController.VedioOffline(System.Int32)">
+            <summary>
+            视频下架
+            </summary>
+            <param name="vedioId"></param>
+            <returns></returns>
+        </member>
         <member name="T:live.Controllers.CommentsController">
             <summary>
             Comments控制器，包含一些对评论的一些基本操作
             </summary>
         </member>
-        <member name="M:live.Controllers.CommentsController.GetAllComments">
+        <member name="M:live.Controllers.CommentsController.GetAllComments(live.Models.QueryParameters)">
             <summary>
-            获取数据库中的所有评论
+            获取所有评论
             </summary>
+            <param name="query"></param>
             <returns></returns>
         </member>
         <member name="M:live.Controllers.CommentsController.DeleteComment(System.Int32)">
@@ -108,7 +123,7 @@
         </member>
         <member name="M:live.Controllers.CommentsController.GetComments(live.Models.VideoAndPage)">
             <summary>
-            查询分页评论
+            查询属于某视频评论
             </summary>
             <param name="videoAndPage">需要一个VideoAndPage类型的json对象,该类型由RecordVideo类型和QueryParameters类型组合为一个json对象</param>
             <returns></returns>
