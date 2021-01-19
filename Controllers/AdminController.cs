@@ -360,32 +360,55 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-        //视频上架
+        /// <summary>
+        /// 视频上架
+        /// </summary>
+        /// <param name="vedioId"></param>
+        /// <returns></returns>
         [HttpPut("VedioOnline/{vedioId}")]
         public JsonResult VedioOnline(int vedioId)
         {
-            RecordVideo recordVideo = _context.RecordVideos.Find(vedioId);
+            var resultState = new ResultState();
+            var recordVideo = _context.RecordVideos.Find(vedioId);
             if (recordVideo.status == 0)
             {
                 recordVideo.status = 1;
                 _context.SaveChanges();
+                resultState.success = true;
+                resultState.code = 1;
+                resultState.message = "视频上架成功";
+                resultState.value = recordVideo;
+                return new JsonResult(resultState);
             }
-            var resultState = new ResultState();
-            resultState.success = true;
-            resultState.code = 1;
-            resultState.message = "查询成功";
-
+            resultState.value = recordVideo;
+            resultState.message = "视频已上架 上传失败";
             return new JsonResult(resultState);
         }
 
-        //视频下架
-        private JsonResult VedioOffline()
+        /// <summary>
+        /// 视频下架
+        /// </summary>
+        /// <param name="vedioId"></param>
+        /// <returns></returns>
+        [HttpPut("VedioOffline/{vedioId}")]
+        public JsonResult VedioOffline(int vedioId)
         {
             var resultState = new ResultState();
-            resultState.success = true;
-            resultState.code = 1;
-            resultState.message = "";
+            var recordVideo = _context.RecordVideos.Find(vedioId);
+            if (recordVideo.status == 1)
+            {
+                recordVideo.status = 0;
+                _context.SaveChanges();
+                resultState.success = true;
+                resultState.code = 1;
+                resultState.message = "视频成功下架";
+                resultState.value = recordVideo;
 
+                return new JsonResult(resultState);
+            }
+
+            resultState.message = "视频已下架 操作失败";
+            resultState.value = recordVideo;
             return new JsonResult(resultState);
         }
 
