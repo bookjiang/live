@@ -222,5 +222,19 @@ namespace live.Controllers
         }
 
 
+
+        /// <summary>
+        /// 通过id查询video
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public ActionResult<RecordVideo> Get(int id)
+        {
+            return _context.RecordVideos.Find(id);
+        }
+
+
+
     }
 }

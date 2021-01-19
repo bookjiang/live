@@ -334,5 +334,17 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
+        /// <summary>
+        /// 通过id查询User
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public ActionResult<User> Get(int id)
+        {
+            return _context.Users.Find(id);
+        }
+
+
     }
 }

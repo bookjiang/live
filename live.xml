@@ -95,6 +95,13 @@
             <param name="vedioId"></param>
             <returns></returns>
         </member>
+        <member name="M:live.Controllers.AdminController.UpdateVedioInfo(live.Models.RecordVideo)">
+            <summary>
+            更新视频信息
+            </summary>
+            <param name="recordVideo"></param>
+            <returns></returns>
+        </member>
         <member name="T:live.Controllers.CommentsController">
             <summary>
             Comments控制器，包含一些对评论的一些基本操作
@@ -126,6 +133,13 @@
             查询属于某视频评论
             </summary>
             <param name="videoAndPage">需要一个VideoAndPage类型的json对象,该类型由RecordVideo类型和QueryParameters类型组合为一个json对象</param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.CommentsController.Get(System.Int32)">
+            <summary>
+            通过id查询Comment
+            </summary>
+            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:live.Controllers.UsersController.register(live.Models.User)">
@@ -163,6 +177,20 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:live.Controllers.UsersController.UpdateVedioInfo(live.Models.RecordVideo)">
+            <summary>
+            用户更新视频信息
+            </summary>
+            <param name="recordVideo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.UsersController.Get(System.Int32)">
+            <summary>
+            通过id查询User
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:live.Controllers.VideoController.uploadFile(Microsoft.AspNetCore.Http.IFormFileCollection,System.Int32,System.String)">
             <summary>
             文件上传
@@ -180,6 +208,13 @@
             获取视频列表
             </summary>
             <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.VideoController.Get(System.Int32)">
+            <summary>
+            通过id查询video
+            </summary>
+            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="T:live.Models.User">
