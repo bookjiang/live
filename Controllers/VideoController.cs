@@ -185,7 +185,8 @@ namespace live.Controllers
             PageInfoList pageUsers = new PageInfoList();
             if (query.pageIndex <= 0)
             {
-                temp = (List<RecordVideo>)_context.RecordVideos.Take(query.pageSize).ToList();
+                temp = (List<RecordVideo>)_context.RecordVideos.Where(x=>x.status==1).Take(query.pageSize).ToList();
+                //temp = (List<RecordVideo>)_context.RecordVideos.Take(query.pageSize).ToList();
                 pageUsers.items = temp;
                 pageUsers.count = count;
                 pageUsers.pageIndex = 1;
@@ -193,7 +194,7 @@ namespace live.Controllers
             }
             else if (query.pageSize * query.pageIndex > count)
             {
-                temp = (List<RecordVideo>)_context.RecordVideos.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                temp = (List<RecordVideo>)_context.RecordVideos.Where(x => x.status == 1).Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
                 pageUsers.items = temp;
                 pageUsers.count = count;
                 pageUsers.pageIndex = count / query.pageSize;
@@ -201,7 +202,7 @@ namespace live.Controllers
             }
             else
             {
-                temp = _context.RecordVideos.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                temp = _context.RecordVideos.Where(x => x.status == 1).Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
                 pageUsers.items = temp;
                 pageUsers.count = count;
                 pageUsers.pageIndex = query.pageIndex;
