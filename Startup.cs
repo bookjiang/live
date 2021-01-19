@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 using System.IO;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace live
 {
@@ -32,6 +33,14 @@ namespace live
             {
                 opt.UseMySQL(Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            //超出设置范围会报InvalidDataException 异常信息
+            services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = long.MaxValue;
+            });
+
+
             services.AddControllers();
 
             ////设置跨域处理
@@ -47,6 +56,7 @@ namespace live
             //    });
             //});
             //注意：.net Core 3.1版本  Cors配置不能同时启用  AllowAnyOrigin()  .AllowAnyMethod()  .AllowAnyHeader()  .AllowCredentials()
+
 
             //添加cors 服务 配置跨域处理   
             services.AddCors(options =>

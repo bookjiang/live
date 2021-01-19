@@ -6,11 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Cors;
 
 namespace live.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("any")]
     public class AdminController : ControllerBase
     {
         private readonly LiveMultiContext _context;

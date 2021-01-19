@@ -148,6 +148,12 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:live.Controllers.VideoController.uploadFile(Microsoft.AspNetCore.Http.IFormFileCollection,System.Int32,System.String)">
+            <summary>
+            流式文件上传
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:live.Models.User">
             <summary>
             User类

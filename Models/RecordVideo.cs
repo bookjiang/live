@@ -14,12 +14,18 @@ namespace live.Models
         }
         [Key]
         public int id { get; set; }
-        public int auchor_id { get; set; }
+        public int anchor_id { get; set; }
         public int status { get; set; }
-        public string catagory { get; set; }
+        public string category { get; set; }
         public string keyword { get; set; }
 
         public string url { get; set; }
+
+        public long size { get; set; }
+
+        public string  type { get; set; }
+        public string  path { get; set; }
+        public string createTime { get; set; }
 
     }
 }
