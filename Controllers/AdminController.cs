@@ -412,6 +412,33 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
+        /// <summary>
+        /// 更新视频信息
+        /// </summary>
+        /// <param name="recordVideo"></param>
+        /// <returns></returns>
+        [HttpPut("UpdateVedioInfo")]
+        public JsonResult UpdateVedioInfo(RecordVideo recordVideo)
+        {
+            var resultState = new ResultState();
+            var recordVideo1 = _context.RecordVideos.Find(recordVideo.id);
+            if (recordVideo.status == recordVideo1.status && recordVideo.category == recordVideo1.category && recordVideo.keyword == recordVideo1.keyword)
+            {
+                resultState.message = "未做任何修改";
+                resultState.value = recordVideo;
+                return new JsonResult(resultState);
+            }
+            recordVideo1.status = recordVideo.status;
+            recordVideo1.category = recordVideo.category;
+            recordVideo1.keyword = recordVideo.keyword;
+            _context.SaveChanges();
+            resultState.success = true;
+            resultState.code = 1;
+            resultState.value = recordVideo;
+            resultState.message = "视频信息更新成功";
+            return new JsonResult(resultState);
+        }
+
 
     }
 }
