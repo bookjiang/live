@@ -165,8 +165,21 @@
         </member>
         <member name="M:live.Controllers.VideoController.uploadFile(Microsoft.AspNetCore.Http.IFormFileCollection,System.Int32,System.String)">
             <summary>
-            流式文件上传
+            文件上传
             </summary>
+        </member>
+        <member name="M:live.Controllers.VideoController.DeleteFile(System.Int32)">
+            <summary>
+            通过id删除视频
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.VideoController.VideoList(live.Models.QueryParameters)">
+            <summary>
+            获取视频列表
+            </summary>
+            <param name="query"></param>
             <returns></returns>
         </member>
         <member name="T:live.Models.User">

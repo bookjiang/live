@@ -18,6 +18,7 @@ namespace live.Models
         public DbSet<RecordVideo> RecordVideos { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Keyword> KeyWords { get; set; }
+       
 
     }
 }
