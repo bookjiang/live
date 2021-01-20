@@ -102,6 +102,13 @@
             <param name="recordVideo"></param>
             <returns></returns>
         </member>
+        <member name="M:live.Controllers.AdminController.VideoList(live.Models.QueryParameters)">
+            <summary>
+            管理员获取所有视频列表
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
         <member name="T:live.Controllers.CommentsController">
             <summary>
             Comments控制器，包含一些对评论的一些基本操作

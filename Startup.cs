@@ -15,6 +15,7 @@ using System.Text.Json;
 using System.IO;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http.Features;
+using Cookie;
 
 namespace live
 {
@@ -29,10 +30,16 @@ namespace live
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddDbContext<LiveMultiContext>(opt =>
             {
                 opt.UseMySQL(Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            //注册为单例
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            //注册Cookie操作接口
+            services.AddSingleton<ICookieHelper, CookieHelper>();
 
             //超出设置范围会报InvalidDataException 异常信息
             services.Configure<FormOptions>(options =>

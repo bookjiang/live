@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using live.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Cors;
+using Cookie;
 
 namespace live.Controllers
 {
@@ -16,10 +17,12 @@ namespace live.Controllers
     public class UsersController : ControllerBase
     {
         private  LiveMultiContext _context;
+        private readonly ICookieHelper _helper;
 
-        public UsersController(LiveMultiContext context)
+        public UsersController(LiveMultiContext context,ICookieHelper helper)
         {
             _context = context;
+            _helper = helper;
         }
 
         //// GET: api/Users
@@ -151,6 +154,13 @@ namespace live.Controllers
         //用户登录
         public JsonResult login([FromBody] User user)
         {
+            //string cookie = _helper.GetCookie(user.id.ToString());
+            ////如果用户已经登录则返回
+            //if(cookie!=null)
+            //{
+            //    return new JsonResult(new ResultState(true, "已登录", 0, user));
+            //}
+
             ResultState resultState = new ResultState();
             if (!UserNameExists(user.name))
             {
@@ -164,6 +174,7 @@ namespace live.Controllers
                 resultState.success = true;
                 resultState.message = "登录成功";
                 resultState.value = user1;
+                _helper.SetCookie("token", user.id +","+ user.name + "," + user.tel + "," + user.id_no + "," + user.role + "," + user.status, 66);
                 return new JsonResult(resultState);
 
             }
@@ -340,9 +351,37 @@ namespace live.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public ActionResult<User> Get(int id)
+        public JsonResult Get(int id)
         {
-            return _context.Users.Find(id);
+            
+            string s=_helper.GetCookie("token");
+            if(s==null)
+            {
+                return new JsonResult(new ResultState(false, "请登录", 0, null));
+            }
+            var a = s.Split(",");
+            try
+            {
+                var user = _context.Users.Find(int.Parse(a[0]));
+                if (user != null)
+                {
+                    return new JsonResult(new ResultState(true, "查询成功", 1, _context.Users.Find(id)));
+                }
+                else
+                {
+                    return new JsonResult(new ResultState(false, "无效cookie", 0, null));
+
+                }
+            }
+            catch (Exception e)
+            {
+                return new JsonResult(new ResultState(false, "无效cookie", 0, null));
+            }
+
+
+
+
+          
         }
 
 
