@@ -357,6 +357,12 @@ namespace live.Controllers
             if(resultState.code==1)
             {
                 resultState.value = _context.Users.Find(id);
+                if(resultState.value==null)
+                {
+                    resultState.success = false;
+                    resultState.message = "用户不存在";
+
+                }
                
             }
             return new JsonResult(resultState);
