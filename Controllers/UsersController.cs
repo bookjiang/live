@@ -16,10 +16,10 @@ namespace live.Controllers
     [EnableCors("any")]
     public class UsersController : ControllerBase
     {
-        private  LiveMultiContext _context;
+        private LiveMultiContext _context;
         private readonly ICookieHelper _helper;
 
-        public UsersController(LiveMultiContext context,ICookieHelper helper)
+        public UsersController(LiveMultiContext context, ICookieHelper helper)
         {
             _context = context;
             _helper = helper;
@@ -45,7 +45,7 @@ namespace live.Controllers
 
         //    return user;
         //}
-        
+
         //// PUT: api/Users/5
         //// To protect from overposting attacks, enable the specific properties you want to bind to, for
         //// more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
@@ -124,7 +124,7 @@ namespace live.Controllers
         /// <param name="user">User</param>
         /// <returns></returns>
         [HttpPost("logon")]
-        public JsonResult register([FromBody]User user)
+        public JsonResult register([FromBody] User user)
         {
             ResultState resultState = new ResultState();
             if (UserNameExists(user.name))
@@ -174,7 +174,7 @@ namespace live.Controllers
                 resultState.success = true;
                 resultState.message = "登录成功";
                 resultState.value = user1;
-                _helper.SetCookie("token", user.id +","+ user.name + "," + user.tel + "," + user.id_no + "," + user.role + "," + user.status, 66);
+                _helper.SetCookie("token", user.id + "," + user.name + "," + user.tel + "," + user.id_no + "," + user.role + "," + user.status, 66);
                 return new JsonResult(resultState);
 
             }
@@ -231,7 +231,7 @@ namespace live.Controllers
                 resultState.message = "信息更新失败";
                 return new JsonResult(resultState);
             }
-                
+
             return new JsonResult(resultState);
 
 
@@ -252,17 +252,17 @@ namespace live.Controllers
             int pageSize1 = query.pageSize;
             List<User> temp = new List<User>();
             PageInfoList pageUsers = new PageInfoList();
-            if (query.pageIndex<=0)
+            if (query.pageIndex <= 0)
             {
-                 temp = (List<User>)_context.Users.Take(query.pageSize).ToList();
+                temp = (List<User>)_context.Users.Take(query.pageSize).ToList();
                 pageUsers.items = temp;
                 pageUsers.count = count;
                 pageUsers.pageIndex = 1;
                 pageUsers.pageSize = query.pageSize;
             }
-            else if(query.pageSize * query.pageIndex >count)
+            else if (query.pageSize * query.pageIndex > count)
             {
-                 temp = (List<User>)_context.Users.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                temp = (List<User>)_context.Users.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
                 pageUsers.items = temp;
                 pageUsers.count = count;
                 pageUsers.pageIndex = count / query.pageSize;
@@ -270,7 +270,7 @@ namespace live.Controllers
             }
             else
             {
-                 temp = _context.Users.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                temp = _context.Users.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
                 pageUsers.items = temp;
                 pageUsers.count = count;
                 pageUsers.pageIndex = query.pageIndex;
@@ -301,12 +301,12 @@ namespace live.Controllers
         public JsonResult delete(int id)
         {
             ResultState resultState = new ResultState();
-            var user =_context.Users.Find(id);
+            var user = _context.Users.Find(id);
             if (user == null)
             {
                 resultState.success = false;
                 resultState.message = "用户不存在";
-                
+
                 return new JsonResult(resultState);
             }
 
@@ -353,11 +353,24 @@ namespace live.Controllers
         [HttpGet("{id}")]
         public JsonResult Get(int id)
         {
-            
-            string s=_helper.GetCookie("token");
-            if(s==null)
+            ResultState resultState = CheckCookie();
+            if(resultState.code==1)
             {
-                return new JsonResult(new ResultState(false, "请登录", 0, null));
+                resultState.value = _context.Users.Find(id);
+               
+            }
+            return new JsonResult(resultState);
+
+
+        }
+
+        private ResultState CheckCookie()
+        {
+
+            string s = _helper.GetCookie("token");
+            if (s == null)
+            {
+                return new ResultState(false, "请登录", 0, null);
             }
             var a = s.Split(",");
             try
@@ -365,25 +378,22 @@ namespace live.Controllers
                 var user = _context.Users.Find(int.Parse(a[0]));
                 if (user != null)
                 {
-                    return new JsonResult(new ResultState(true, "查询成功", 1, _context.Users.Find(id)));
+                    return new ResultState(true, "验证成功", 1, null); 
                 }
                 else
                 {
-                    return new JsonResult(new ResultState(false, "无效cookie", 0, null));
+                    return new ResultState(false, "无效cookie", 0, null);
 
                 }
             }
             catch (Exception e)
             {
-                return new JsonResult(new ResultState(false, "无效cookie", 0, null));
+                return new ResultState(false, "无效cookie", 0, null);
             }
 
 
-
-
-          
         }
 
-
     }
+        
 }
