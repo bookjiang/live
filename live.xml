@@ -269,5 +269,39 @@
             状态 0表示禁言
             </summary>
         </member>
+        <member name="M:live.utils.CookieHelper.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor)">
+            <summary>
+            通过构造函数进行注入
+            </summary>
+            <param name="httpContextAccessor"></param>
+        </member>
+        <member name="M:live.utils.CookieHelper.DeleteCookie(System.String)">
+            <summary>
+            根据key值删除对应的Cookie
+            </summary>
+            <param name="key"></param>
+        </member>
+        <member name="M:live.utils.CookieHelper.GetCookie(System.String)">
+            <summary>
+            根据key值获取Cookie的value值
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.utils.CookieHelper.SetCookie(System.String,System.String)">
+            <summary>
+            设置cookie值
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:live.utils.CookieHelper.SetCookie(System.String,System.String,System.Int32)">
+            <summary>
+            设置cookie值以及过期时间
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="expiresTime"></param>
+        </member>
     </members>
 </doc>
