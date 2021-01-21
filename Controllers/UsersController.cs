@@ -205,7 +205,7 @@ namespace live.Controllers
                 resultState.success = true;
                 resultState.message = "登录成功";
                 resultState.value = user1;
-                _helper.SetCookie("token", user.id + "," + user.name + "," + user.tel + "," + user.id_no + "," + user.role + "," + user.status, 66);
+                _helper.SetCookie("token", user1.id + "," + user1.name + "," + user1.tel + "," + user1.id_no + "," + user1.role + "," + user1.status, 66);
                 return new JsonResult(resultState);
 
             }
