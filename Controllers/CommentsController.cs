@@ -199,6 +199,7 @@ namespace live.Controllers
             {
                 _context.Comments.Add(comment);
                 _context.SaveChanges();
+
             }
             catch
             {

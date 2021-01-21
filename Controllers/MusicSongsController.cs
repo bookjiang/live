@@ -103,10 +103,40 @@ namespace live.Controllers
         //    return musicSong;
         //}
 
-        private bool MusicSongExists(int id)
+        //private bool MusicSongExists(int id)
+        //{
+        //    return _context.MusicSong.Any(e => e.id == id);
+        //}
+        private ResultState CheckCookie()
         {
-            return _context.MusicSong.Any(e => e.id == id);
+
+            string s = _helper.GetCookie("token");
+            if (s == null)
+            {
+                return new ResultState(false, "请登录", 0, null);
+            }
+            var a = s.Split(",");
+            try
+            {
+                var user = _context.Users.Find(int.Parse(a[0]));
+                if (user != null)
+                {
+                    return new ResultState(true, "验证成功", 1, null);
+                }
+                else
+                {
+                    return new ResultState(false, "无效cookie（未找到用户）", 0, null);
+
+                }
+            }
+            catch
+            {
+                return new ResultState(false, "无效cookie(异常)", 0, null);
+            }
+
+
         }
+
         /// <summary>
         /// 添加歌曲
         /// </summary>
@@ -115,8 +145,22 @@ namespace live.Controllers
         [HttpPost]
         public JsonResult AddSong([FromBody] MusicSong song)
         {
+            if(song != null)
+            {
+                try {
+                    _context.Add(song);
+                    _context.SaveChanges();
+                    return new JsonResult(new ResultState(true, "添加成功", 1, song));
+                }
+                catch
+                {
+                    return new JsonResult(new ResultState(false, "发生一个异常，添加歌曲失败", 1, song));
+                }
+                
+            }
+            return new JsonResult(new ResultState(false, "一个异常发生，添加失败", 1, song));
 
-            return new JsonResult(new ResultState());
+
         }
     }
 }

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace live.Models
 {
     public class MusicSong
     {
+        [Key]
         public int id { get; set; }
         public string name { get; set; }
         public int album { get; set; }
