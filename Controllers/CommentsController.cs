@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using live.Models;
 using Microsoft.AspNetCore.Cors;
+using live.utils;
 
 namespace live.Controllers
 {
@@ -19,10 +20,12 @@ namespace live.Controllers
     public class CommentsController : ControllerBase
     {
         private readonly LiveMultiContext _context;
+        private readonly ICookieHelper _helper;
 
-        public CommentsController(LiveMultiContext context)
+        public CommentsController(LiveMultiContext context, ICookieHelper helper)
         {
             _context = context;
+            _helper = helper;
         }
 
         /// <summary>
@@ -33,16 +36,16 @@ namespace live.Controllers
         [HttpPost("GetAllComments")]
         public JsonResult GetAllComments([FromBody] QueryParameters query)
         {
-           
+
             ResultState resultState = new ResultState();
-            var comments = _context.Comments.ToList();
-            var count = comments.Count();
+            //var comments = _context.Comments.ToList();
+            var count = _context.Comments.Count();
 
             PageInfoList pageComments = new PageInfoList();
             List<Comment> temp;
             if (query.pageIndex <= 0)
             {
-                temp = comments.Take(query.pageSize).ToList();
+                temp = _context.Comments.Take(query.pageSize).ToList();
                 pageComments.items = temp;
                 pageComments.count = count;
                 pageComments.pageIndex = 1;
@@ -50,7 +53,7 @@ namespace live.Controllers
             }
             else if (query.pageSize * query.pageIndex > count)
             {
-                temp = comments.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                temp = _context.Comments.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
                 pageComments.items = temp;
                 pageComments.count = count;
                 pageComments.pageIndex = count / query.pageSize;
@@ -58,7 +61,7 @@ namespace live.Controllers
             }
             else
             {
-                temp = comments.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                temp = _context.Comments.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
                 pageComments.items = temp;
                 pageComments.count = count;
                 pageComments.pageIndex = query.pageIndex;
@@ -72,9 +75,6 @@ namespace live.Controllers
             return new JsonResult(resultState);
         }
 
-
-
-        
         /// <summary>
         /// 删除评论
         /// </summary>
@@ -83,18 +83,30 @@ namespace live.Controllers
         [HttpDelete("DeleteComment/{id}")]
         public JsonResult DeleteComment(int id)
         {
-            ResultState resultState = new ResultState();
-            var newComment = _context.Comments.Where(c => c.id == id).FirstOrDefault();
+            ResultState resultState = CheckCookie();
+            //ResultState resultState = new ResultState();
+            if (resultState.code == 0)
+            {
+                return new JsonResult(resultState);
+            }
+            var newComment = _context.Comments.Find(id);
             if (newComment == null)    //数据库中未找到该条评论，删除失败
             {
                 resultState.success = false;
+                resultState.code = 0;
                 resultState.message = "删除评论失败！";
                 resultState.value = newComment;
                 return new JsonResult(resultState);
             }
-            
-            _context.Comments.Remove(newComment);          //数据库找到该条评论，执行删除操作
-            _context.SaveChanges();
+            try
+            {
+                _context.Comments.Remove(newComment);          //数据库找到该条评论，执行删除操作
+                _context.SaveChanges();
+            }
+            catch
+            {
+                return new JsonResult(new ResultState(false, "删除评论失败", 0, null));
+            }
 
             resultState.success = true;
             resultState.code = 1;
@@ -118,6 +130,35 @@ namespace live.Controllers
 
             return false;
         }
+        private ResultState CheckCookie()
+        {
+
+            string s = _helper.GetCookie("token");
+            if (s == null)
+            {
+                return new ResultState(false, "请登录", 0, null);
+            }
+            var a = s.Split(",");
+            try
+            {
+                var user = _context.Users.Find(int.Parse(a[0]));
+                if (user != null)
+                {
+                    return new ResultState(true, "验证成功", 1, null);
+                }
+                else
+                {
+                    return new ResultState(false, "无效cookie", 0, null);
+
+                }
+            }
+            catch (Exception e)
+            {
+                return new ResultState(false, "无效cookie", 0, null);
+            }
+
+
+        }
 
         /// <summary>
         /// 添加一条评论
@@ -127,23 +168,38 @@ namespace live.Controllers
         [HttpPost("AddComment")]
         public JsonResult AddComment([FromBody] Comment comment)
         {
-            ResultState resultState = new ResultState();
-           
-            
-            if (ContainSensitiveWord(comment)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            )       //判断敏感词
+            ResultState resultState = CheckCookie();
+
+            if (resultState.code == 0)
             {
-                resultState.success = false;
-                resultState.code = 0;
-                resultState.message = "添加评论失败！";
-                resultState.value = comment;
                 return new JsonResult(resultState);
             }
-             
-            _context.Comments.Add(comment);
-            _context.SaveChanges();
+            try
+            {
+                if (ContainSensitiveWord(comment))       //判断敏感词
+                {
+                    resultState.success = false;
+                    resultState.code = 0;
+                    resultState.message = "评论包含非法词汇，请修改后添加！";
+                    resultState.value = comment;
+                    return new JsonResult(resultState);
+                }
+            }
+            catch
+            {
+                return new JsonResult(new ResultState(false, "发生异常，请检查请求头参数", 0, null));
 
-            resultState.success = true;
-            resultState.code = 1;
+            }
+            try
+            {
+                _context.Comments.Add(comment);
+                _context.SaveChanges();
+            }
+            catch
+            {
+                return new JsonResult(new ResultState(false, "添加评论时发生异常，请检查求体参数", 0, null));
+
+            }
             resultState.message = "添加成功";
             resultState.value = comment;
             return new JsonResult(resultState);
@@ -158,16 +214,25 @@ namespace live.Controllers
         [HttpPost("GetComments")]
         public JsonResult GetComments([FromBody] VideoAndPage videoAndPage)
         {
+            ResultState resultState = CheckCookie();
+
+            if (resultState.code == 0)
+            {
+                return new JsonResult(resultState);
+            }
+            if (videoAndPage == null || videoAndPage.RecordVideo == null || videoAndPage.QueryParameters == null)
+            {
+                return new JsonResult(new ResultState(false, "请求体参数异常", 0, null));
+            }
+
             //拆包两个对象
             var recordVideo = videoAndPage.RecordVideo;
             var query = videoAndPage.QueryParameters;
 
-            ResultState resultState = new ResultState();
 
-            
-            var comments =_context.Comments.Where(c => c.video_id == recordVideo.id).ToList();
+            var count = _context.Comments.Where(c => c.video_id == recordVideo.id).Count();
+            var comments = _context.Comments.Where(c => c.video_id == recordVideo.id).ToList();
 
-            var count = comments.Count();
 
             var temp = new List<Comment>();
             PageInfoList pageComments = new PageInfoList();
@@ -196,7 +261,7 @@ namespace live.Controllers
                 pageComments.pageIndex = query.pageIndex;
                 pageComments.pageSize = query.pageSize;
             }
- 
+
             resultState.success = true;
             resultState.code = 1;
             resultState.message = "获取评论列表成功";
@@ -213,7 +278,13 @@ namespace live.Controllers
         [HttpGet("{id}")]
         public ActionResult<Comment> Get(int id)
         {
-            return _context.Comments.Find(id);
+            ResultState resultState = CheckCookie();
+
+            if (resultState.code == 0)
+            {
+                return new JsonResult(resultState);            }
+
+            return new JsonResult(_context.Comments.Find(id));
         }
 
     }
