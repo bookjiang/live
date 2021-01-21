@@ -445,7 +445,10 @@ namespace live.Controllers
 
         }
 
-
+        /// <summary>
+        /// 刷新cookie
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("refresh")]
         public JsonResult refresh()
         {
@@ -462,6 +465,11 @@ namespace live.Controllers
 
         }
 
+        /// <summary>
+        /// 登出，删除cookie
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("logout/{id}")]
         public JsonResult logout(int id)
         {

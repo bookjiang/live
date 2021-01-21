@@ -53,6 +53,13 @@
             <param name="admin"></param>
             <returns></returns>     
         </member>
+        <member name="M:live.Controllers.AdminController.AdminLogout">
+            <summary>
+            管理员退出登录
+            </summary>
+            <param></param>
+            <returns></returns>
+        </member>
         <member name="M:live.Controllers.AdminController.KeywordInfoList(live.Models.QueryParameters)">
             <summary>
             查询关键字表
@@ -149,6 +156,27 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:live.Controllers.MusicSongListController.getSongList(live.Models.QueryParameters)">
+            <summary>
+            分页获取所有歌单列表
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.MusicSongListController.getSongListByUserId(live.Models.QueryParameters,System.Int32)">
+            <summary>
+            通过用户id分页获取所有歌单列表
+            </summary>
+            <param name="query"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.MusicSongsController.AddSong(live.Models.MusicSong)">
+            <summary>
+            添加歌曲
+            </summary>
+            <param name="song"></param>
+            <returns></returns>
+        </member>
         <member name="M:live.Controllers.UsersController.register(live.Models.User)">
             <summary>
             用户注册
@@ -198,6 +226,19 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:live.Controllers.UsersController.refresh">
+            <summary>
+            刷新cookie
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.UsersController.logout(System.Int32)">
+            <summary>
+            登出，删除cookie
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:live.Controllers.VideoController.uploadFile(Microsoft.AspNetCore.Http.IFormFileCollection,System.Int32,System.String)">
             <summary>
             文件上传
@@ -223,6 +264,16 @@
             </summary>
             <param name="id"></param>
             <returns></returns>
+        </member>
+        <member name="T:live.Models.MusicUser">
+            <summary>
+            音乐 user类
+            </summary>
+        </member>
+        <member name="M:live.Models.MusicUser.#ctor">
+            <summary>
+            构造
+            </summary>
         </member>
         <member name="T:live.Models.User">
             <summary>

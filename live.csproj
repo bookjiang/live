@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>8ce10328-ae9e-4875-b418-d7eb350170aa</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -9,6 +10,13 @@
     <OutputPath></OutputPath>
     <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="publish1\**" />
+    <Content Remove="publish1\**" />
+    <EmbeddedResource Remove="publish1\**" />
+    <None Remove="publish1\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="Cookie.csproj" />
