@@ -15,13 +15,20 @@ namespace live.Models
             this.pageSize = 5;
             this.items = "";
         }
-        //public PageInfoList(List<T> items,int count,int pageIndex,int pageSize)
+        //public PageInfoList(List<T> items, int count, int pageIndex, int pageSize)
         //{
         //    this.pageIndex = pageIndex;
         //    this.pageSize = pageSize;
         //    this.items.AddRange(items);
         //    this.count = count;
 
+        //}
+        //public PageInfoList(int count,int pageIndex,int pageSize,object items)
+        //{
+        //    this.pageIndex = pageIndex;
+        //    this.pageSize = pageSize;
+        //    this.items = items;
+        //    this.count = count;
         //}
 
 
