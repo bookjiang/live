@@ -37,42 +37,54 @@ namespace live.Controllers
         public JsonResult GetAllComments([FromBody] QueryParameters query)
         {
 
-            ResultState resultState = new ResultState();
+            //ResultState resultState = new ResultState();
             //var comments = _context.Comments.ToList();
             var count = _context.Comments.Count();
 
             PageInfoList pageComments = new PageInfoList();
             List<Comment> temp;
-            if (query.pageIndex <= 0)
+            try
             {
-                temp = _context.Comments.Take(query.pageSize).ToList();
-                pageComments.items = temp;
-                pageComments.count = count;
-                pageComments.pageIndex = 1;
-                pageComments.pageSize = query.pageSize;
+                if (query.pageIndex <= 0)
+                {
+                    temp = _context.Comments.Take(query.pageSize).ToList();
+                    //var pageComments =  new PageInfoList(count,1,query.pageSize,temp);
+                    pageComments.items = temp;
+                    pageComments.count = count;
+                    pageComments.pageIndex = 1;
+                    pageComments.pageSize = query.pageSize;
+                }
+                else if (query.pageSize * query.pageIndex > count)
+                {
+                    temp = _context.Comments.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                    pageComments.items = temp;
+                    pageComments.count = count;
+                    pageComments.pageIndex = count / query.pageSize;
+                    pageComments.pageSize = query.pageSize;
+                    //var pageComments = new PageInfoList(count, count / query.pageSize, query.pageSize,temp);
+                }
+                else
+                {
+                    temp = _context.Comments.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                    pageComments.items = temp;
+                    pageComments.count = count;
+                    pageComments.pageIndex = query.pageIndex;
+                    pageComments.pageSize = query.pageSize;
+                    //var pageComments = new PageInfoList(count, query.pageIndex, query.pageSize, temp);
+                }
+
             }
-            else if (query.pageSize * query.pageIndex > count)
+            catch
             {
-                temp = _context.Comments.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
-                pageComments.items = temp;
-                pageComments.count = count;
-                pageComments.pageIndex = count / query.pageSize;
-                pageComments.pageSize = query.pageSize;
-            }
-            else
-            {
-                temp = _context.Comments.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
-                pageComments.items = temp;
-                pageComments.count = count;
-                pageComments.pageIndex = query.pageIndex;
-                pageComments.pageSize = query.pageSize;
+                return new JsonResult(new ResultState(false, "获取评论失败", 0, null));
             }
 
-            resultState.success = true;
-            resultState.code = 1;
-            resultState.message = "获取所有评论成功";
-            resultState.value = pageComments;
-            return new JsonResult(resultState);
+            
+            //resultState.success = true;
+            //resultState.code = 1;
+            //resultState.message = "获取所有评论成功";
+            //resultState.value = pageComments;
+            return new JsonResult(new ResultState(true, "获取评论成功",1, pageComments));
         }
 
         /// <summary>
@@ -90,17 +102,14 @@ namespace live.Controllers
                 return new JsonResult(resultState);
             }
             var newComment = _context.Comments.Find(id);
+
             if (newComment == null)    //数据库中未找到该条评论，删除失败
             {
-                resultState.success = false;
-                resultState.code = 0;
-                resultState.message = "删除评论失败！";
-                resultState.value = newComment;
-                return new JsonResult(resultState);
+                return new JsonResult(new ResultState(false, "删除评论失败", 0, null));
             }
             try
             {
-                _context.Comments.Remove(newComment);          //数据库找到该条评论，执行删除操作
+                _context.Comments.Remove(newComment);     //数据库找到该条评论，执行删除操作
                 _context.SaveChanges();
             }
             catch
@@ -108,11 +117,7 @@ namespace live.Controllers
                 return new JsonResult(new ResultState(false, "删除评论失败", 0, null));
             }
 
-            resultState.success = true;
-            resultState.code = 1;
-            resultState.message = "删除评论成功";
-            resultState.value = newComment;
-            return new JsonResult(resultState);
+            return new JsonResult(new ResultState(true, "删除评论成功", 1, newComment));
 
         }
 
@@ -130,6 +135,9 @@ namespace live.Controllers
 
             return false;
         }
+
+
+        //检查Cookies是否正常
         private ResultState CheckCookie()
         {
 
@@ -148,13 +156,13 @@ namespace live.Controllers
                 }
                 else
                 {
-                    return new ResultState(false, "无效cookie", 0, null);
+                    return new ResultState(false, "无效cookie（未找到用户）", 0, null);
 
                 }
             }
-            catch (Exception e)
+            catch
             {
-                return new ResultState(false, "无效cookie", 0, null);
+                return new ResultState(false, "无效cookie(异常)", 0, null);
             }
 
 
@@ -178,11 +186,8 @@ namespace live.Controllers
             {
                 if (ContainSensitiveWord(comment))       //判断敏感词
                 {
-                    resultState.success = false;
-                    resultState.code = 0;
-                    resultState.message = "评论包含非法词汇，请修改后添加！";
-                    resultState.value = comment;
-                    return new JsonResult(resultState);
+                    
+                    return new JsonResult(new ResultState(false, "评论包含非法词汇，请修改后添加！",0,comment));
                 }
             }
             catch
@@ -200,9 +205,7 @@ namespace live.Controllers
                 return new JsonResult(new ResultState(false, "添加评论时发生异常，请检查求体参数", 0, null));
 
             }
-            resultState.message = "添加成功";
-            resultState.value = comment;
-            return new JsonResult(resultState);
+            return new JsonResult(new ResultState(true, "添加评论成功", 1, comment));
         }
 
 
