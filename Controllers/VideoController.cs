@@ -1,4 +1,5 @@
 ﻿using live.Models;
+using live.utils;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,11 +19,13 @@ namespace live.Controllers
     public class VideoController : ControllerBase
     {
         private LiveMultiContext _context;
+        private readonly ICookieHelper _helper;
         //private string _targetFilePath;
 
-        public VideoController(LiveMultiContext context)
+        public VideoController(LiveMultiContext context,ICookieHelper helper)
         {
             _context = context;
+            _helper = helper;
         }
 
         /// <summary>
@@ -80,73 +83,86 @@ namespace live.Controllers
         [HttpPost("uploadFile")]
         public JsonResult uploadFile(IFormFileCollection file,[FromForm]int anchor_id, [FromForm] string category)
         {
-            ResultState resultState = new ResultState();
-            List<RecordVideo> fileList = new List<RecordVideo>();
-            //IFormFileCollection file = items.GetFile
-            try
+
+            ResultState resultState = CheckCookie();
+            if (resultState.code !=0)
             {
-                foreach (var item in file)
+
+                //ResultState resultState = new ResultState();
+                List<RecordVideo> fileList = new List<RecordVideo>();
+                if (file.Count == 0)
+                    return new JsonResult(new ResultState(false, "未上传文件", 0, null));
+
+                //IFormFileCollection file = items.GetFile
+                try
                 {
-                    RecordVideo recordVideo = new RecordVideo();
-                    recordVideo.keyword = item.FileName;
-                    recordVideo.size = item.Length / 1024;
-                    recordVideo.type = recordVideo.keyword.Substring(recordVideo.keyword.LastIndexOf('.') + 1).ToUpper();
-                    // recordVideo.guid = Guid.NewGuid().ToString();
-
-                    //string filePath = hostEnv.ContentRootPath + "/wwwroot/upload/" + recordVideo.guid + @"/";
-                    //string filePath = "/usr/local/nginx/html/mp4/";
-                    string filePath = "E:\\";
-
-                    if (!Directory.Exists(filePath))
+                    foreach (var item in file)
                     {
-                        Directory.CreateDirectory(filePath);
+                        RecordVideo recordVideo = new RecordVideo();
+                        recordVideo.keyword = item.FileName;
+                        recordVideo.size = item.Length / 1024;
+                        recordVideo.type = recordVideo.keyword.Substring(recordVideo.keyword.LastIndexOf('.') + 1).ToUpper();
+                        // recordVideo.guid = Guid.NewGuid().ToString();
+
+                        //string filePath = hostEnv.ContentRootPath + "/wwwroot/upload/" + recordVideo.guid + @"/";
+                        //string filePath = "/usr/local/nginx/html/mp4/";
+                        string filePath = "E:\\";
+
+                        if (!Directory.Exists(filePath))
+                        {
+                            Directory.CreateDirectory(filePath);
+                        }
+
+                        using (FileStream fs = System.IO.File.Create(filePath + recordVideo.keyword))
+                        {
+                            // 复制文件
+                            item.CopyTo(fs);
+                            // 清空缓冲区数据
+                            fs.Flush();
+                        }
+                        recordVideo.path = filePath.Replace("\\", "/") + recordVideo.keyword;
+                        //recordVideo.url = "http://" + _accessor.HttpContext.Request.Host + "/upload/" + recordVideo.guid + "/" + recordVideo.filename;
+                        recordVideo.url = "http://218.244.154.17/" + recordVideo.keyword;
+                        recordVideo.createTime = DateTime.Now.ToString();
+                        recordVideo.status = 0;  //上传时默认未审核
+                        recordVideo.anchor_id = anchor_id;
+                        recordVideo.category = category;
+                        //recordVideo.parentId = 0;
+                        //recordVideo.isDeal = 0;
+                        fileList.Add(recordVideo);
+
+
                     }
-
-                    using (FileStream fs = System.IO.File.Create(filePath + recordVideo.keyword))
-                    {
-                        // 复制文件
-                        item.CopyTo(fs);
-                        // 清空缓冲区数据
-                        fs.Flush();
-                    }
-                    recordVideo.path = filePath.Replace("\\", "/") + recordVideo.keyword;
-                    //recordVideo.url = "http://" + _accessor.HttpContext.Request.Host + "/upload/" + recordVideo.guid + "/" + recordVideo.filename;
-                    recordVideo.url = "http://218.244.154.17/" + recordVideo.keyword;
-                    recordVideo.createTime = DateTime.Now.ToString();
-                    recordVideo.status = 0;  //上传时默认未审核
-                    recordVideo.anchor_id = anchor_id;
-                    recordVideo.category = category;
-                    //recordVideo.parentId = 0;
-                    //recordVideo.isDeal = 0;
-                    fileList.Add(recordVideo);
-
-
                 }
-            }
-            catch(Exception e)
-            {
+                catch (Exception e)
+                {
+                    resultState.value = fileList;
+                    resultState.success = false;
+                    resultState.message = "插入失败";
+                    return new JsonResult(resultState);
+                }
+
+
+                //将filelist写入数据库
+                //TODO
+
+
+                _context.RecordVideos.AddRange(fileList);
+                _context.SaveChanges();
+
+
+
+                //FileBus fileBus = new FileBus(_context);
+                //fileBus.AddList(fileList);
                 resultState.value = fileList;
-                resultState.success = false;
-                resultState.message = "插入失败";
+                resultState.success = true;
+                resultState.message = "插入成功";
                 return new JsonResult(resultState);
+
             }
-            
-
-            //将filelist写入数据库
-            //TODO
-
-
-            _context.RecordVideos.AddRange(fileList);
-            _context.SaveChanges();
-
-
-
-            //FileBus fileBus = new FileBus(_context);
-            //fileBus.AddList(fileList);
-            resultState.value = fileList;
-            resultState.success = true;
-            resultState.message = "插入成功";
             return new JsonResult(resultState);
+
+
         }
 
         /// <summary>
@@ -157,17 +173,37 @@ namespace live.Controllers
         [HttpDelete("DeleteFile/{id}")]
         public JsonResult DeleteFile(int id)
         {
-            
-            var video = _context.RecordVideos.FirstOrDefault(r => r.id == id);
-            if(video == null)
-            {
-                return  new JsonResult(new ResultState(false, "删除失败", 0, video));
-            }
-            _context.RecordVideos.Remove(video);
-            _context.SaveChanges();
 
-            
-            return new JsonResult(new ResultState(true, "删除成功", 1, video));
+            ResultState resultState = CheckCookie();
+            if (resultState.code !=0)
+            {
+                //只能用户发的删除自己的
+
+                var video = _context.RecordVideos.FirstOrDefault(r => r.id == id);
+                if(resultState.message=="管理员登录"||video.anchor_id==resultState.code)
+                {
+                    if (video == null)
+                    {
+                        return new JsonResult(new ResultState(false, "删除失败", 0, video));
+                    }
+                    _context.RecordVideos.Remove(video);
+                    _context.SaveChanges();
+
+
+                    return new JsonResult(new ResultState(true, "删除成功", 1, video));
+                }
+                else
+                {
+                    return new JsonResult(new ResultState(false, "非管理员和作者，无法删除", 0, video));
+                }
+
+
+
+
+            }
+            return new JsonResult(resultState);
+
+           
 
         }
 
@@ -197,7 +233,7 @@ namespace live.Controllers
                 temp = (List<RecordVideo>)_context.RecordVideos.Where(x => x.status == 1).Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
                 pageUsers.items = temp;
                 pageUsers.count = count;
-                pageUsers.pageIndex = count / query.pageSize;
+                pageUsers.pageIndex = count / query.pageSize+1;
                 pageUsers.pageSize = query.pageSize;
             }
             else
@@ -236,6 +272,47 @@ namespace live.Controllers
         }
 
 
+        private ResultState CheckCookie()
+        {
+
+            string s = _helper.GetCookie("token");
+            if (s == null)
+            {
+                return new ResultState(false, "请登录", 0, null);
+            }
+            var a = s.Split(",");
+            try
+            {
+                var user = _context.Users.Find(int.Parse(a[0]));
+                var admin = _context.Admins.Find(int.Parse(a[0]));
+
+                if (user != null)
+                {
+                    return new ResultState(true, "用户登录", user.id, null);//code=2表示用户登录进来
+                }
+                else if(admin != null)
+                {
+                    return new ResultState(true, "管理员登录", admin.id, null);//code=3表示管理员登录进来
+                }
+                else
+                {
+                    return new ResultState(false, "无效cookie,不存在操作用户", 0, null);
+
+                }
+            }
+            catch (Exception e)
+            {
+                return new ResultState(false, "无效cookie", 0, null);
+            }
+
+
+        }
 
     }
+
+
 }
+
+
+
+
