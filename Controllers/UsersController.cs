@@ -196,43 +196,51 @@ namespace live.Controllers
         [HttpPut("updateInfo")]
         public JsonResult updateInfo([FromBody] User user)
         {
-            ResultState resultState = new ResultState();
-            if (!UserExists(user.id))
+            ResultState resultState = CheckCookie();
+            if (resultState.code == 1)
             {
-                resultState.success = false;
-                resultState.message = "用户id不存在";
-                return new JsonResult(resultState);
-            }
-            var user1 = _context.Users.Find(user.id);
+                //ResultState resultState = new ResultState();
+                if (!UserExists(user.id))
+                {
+                    resultState.success = false;
+                    resultState.message = "用户id不存在";
+                    return new JsonResult(resultState);
+                }
+                var user1 = _context.Users.Find(user.id);
 
-            if (user1.name != user.name && UserNameExists(user.name))
-            {
-                resultState.success = false;
-                resultState.message = "用户名已存在，请更换";
+                if (user1.name != user.name && UserNameExists(user.name))
+                {
+                    resultState.success = false;
+                    resultState.message = "用户名已存在，请更换";
+                    return new JsonResult(resultState);
+
+                }
+                //直接用user1=user赋值不行，原理未知
+                user1.name = user.name;
+                user1.id_no = user.id_no;
+                user1.tel = user.tel;
+                user1.psd = user.psd;
+                //_context.Users.Update(user);
+                var count = _context.SaveChanges();
+                if (count == 1)
+                {
+                    resultState.success = true;
+                    resultState.message = "信息更新成功";
+                    resultState.value = user;
+                }
+                else
+                {
+                    resultState.success = false;
+                    resultState.message = "信息更新失败";
+                    return new JsonResult(resultState);
+                }
+
                 return new JsonResult(resultState);
 
             }
-            //直接用user1=user赋值不行，原理未知
-            user1.name = user.name;
-            user1.id_no = user.id_no;
-            user1.tel = user.tel;
-            user1.psd = user.psd;
-            //_context.Users.Update(user);
-            var count = _context.SaveChanges();
-            if (count == 1)
-            {
-                resultState.success = true;
-                resultState.message = "信息更新成功";
-                resultState.value = user;
-            }
-            else
-            {
-                resultState.success = false;
-                resultState.message = "信息更新失败";
-                return new JsonResult(resultState);
-            }
-
             return new JsonResult(resultState);
+
+           
 
 
 
@@ -248,45 +256,55 @@ namespace live.Controllers
         [HttpPost("userInfoList")]
         public JsonResult userInfoList([FromBody] QueryParameters query)
         {
-            int count = _context.Users.Count();
-            int pageSize1 = query.pageSize;
-            List<User> temp = new List<User>();
-            PageInfoList pageUsers = new PageInfoList();
-            if (query.pageIndex <= 0)
-            {
-                temp = (List<User>)_context.Users.Take(query.pageSize).ToList();
-                pageUsers.items = temp;
-                pageUsers.count = count;
-                pageUsers.pageIndex = 1;
-                pageUsers.pageSize = query.pageSize;
-            }
-            else if (query.pageSize * query.pageIndex > count)
-            {
-                temp = (List<User>)_context.Users.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
-                pageUsers.items = temp;
-                pageUsers.count = count;
-                pageUsers.pageIndex = count / query.pageSize;
-                pageUsers.pageSize = query.pageSize;
-            }
-            else
-            {
-                temp = _context.Users.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
-                pageUsers.items = temp;
-                pageUsers.count = count;
-                pageUsers.pageIndex = query.pageIndex;
-                pageUsers.pageSize = query.pageSize;
-            }
 
-            //PageInfoList<User> pageUsers = new PageInfoList<User>(temp, count, query.pageIndex, query.pageSize);
-            //pageUsers.items = temp;
-            //pageUsers.count = count;
-            //pageUsers.pageIndex = query.pageIndex;
-            //pageUsers.pageSize = query.pageSize;
-            ResultState resultState = new ResultState();
-            resultState.success = true;
-            resultState.message = "查询成功";
-            resultState.value = pageUsers;
+
+            ResultState resultState = CheckCookie();
+            if (resultState.code == 1)
+            {
+                int count = _context.Users.Count();
+                int pageSize1 = query.pageSize;
+                List<User> temp = new List<User>();
+                PageInfoList pageUsers = new PageInfoList();
+                if (query.pageIndex <= 0)
+                {
+                    temp = (List<User>)_context.Users.Take(query.pageSize).ToList();
+                    pageUsers.items = temp;
+                    pageUsers.count = count;
+                    pageUsers.pageIndex = 1;
+                    pageUsers.pageSize = query.pageSize;
+                }
+                else if (query.pageSize * query.pageIndex > count)
+                {
+                    temp = (List<User>)_context.Users.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                    pageUsers.items = temp;
+                    pageUsers.count = count;
+                    pageUsers.pageIndex = count / query.pageSize+1;
+                    pageUsers.pageSize = query.pageSize;
+                }
+                else
+                {
+                    temp = _context.Users.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                    pageUsers.items = temp;
+                    pageUsers.count = count;
+                    pageUsers.pageIndex = query.pageIndex;
+                    pageUsers.pageSize = query.pageSize;
+                }
+
+                //PageInfoList<User> pageUsers = new PageInfoList<User>(temp, count, query.pageIndex, query.pageSize);
+                //pageUsers.items = temp;
+                //pageUsers.count = count;
+                //pageUsers.pageIndex = query.pageIndex;
+                //pageUsers.pageSize = query.pageSize;
+                //ResultState resultState = new ResultState();
+                resultState.success = true;
+                resultState.message = "查询成功";
+                resultState.value = pageUsers;
+                return new JsonResult(resultState);
+
+            }
             return new JsonResult(resultState);
+
+           
 
 
         }
@@ -300,23 +318,33 @@ namespace live.Controllers
         [HttpDelete("delete/{id}")]
         public JsonResult delete(int id)
         {
-            ResultState resultState = new ResultState();
-            var user = _context.Users.Find(id);
-            if (user == null)
+
+
+            ResultState resultState = CheckCookie();
+            if (resultState.code == 1)
             {
-                resultState.success = false;
-                resultState.message = "用户不存在";
+                var user = _context.Users.Find(id);
+                if (user == null)
+                {
+                    resultState.success = false;
+                    resultState.message = "用户不存在";
+
+                    return new JsonResult(resultState);
+                }
+
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+                resultState.success = true;
+                resultState.message = "删除成功";
+
 
                 return new JsonResult(resultState);
+
             }
-
-            _context.Users.Remove(user);
-            _context.SaveChanges();
-            resultState.success = true;
-            resultState.message = "删除成功";
-
-
             return new JsonResult(resultState);
+
+           
+            
         }
 
         /// <summary>
@@ -327,22 +355,30 @@ namespace live.Controllers
         [HttpPut("UpdateVedioInfo")]
         public JsonResult UpdateVedioInfo(RecordVideo recordVideo)
         {
-            var resultState = new ResultState();
-            var recordVideo1 = _context.RecordVideos.Find(recordVideo.id);
-            if (recordVideo.category == recordVideo1.category && recordVideo.keyword == recordVideo1.keyword)
+            ResultState resultState = CheckCookie();
+            if (resultState.code == 1)
             {
-                resultState.message = "未做任何修改";
+                var recordVideo1 = _context.RecordVideos.Find(recordVideo.id);
+                if (recordVideo.category == recordVideo1.category && recordVideo.keyword == recordVideo1.keyword)
+                {
+                    resultState.message = "未做任何修改";
+                    resultState.value = recordVideo;
+                    return new JsonResult(resultState);
+                }
+                recordVideo1.category = recordVideo.category;
+                recordVideo1.keyword = recordVideo.keyword;
+                _context.SaveChanges();
+                resultState.success = true;
+                resultState.code = 1;
                 resultState.value = recordVideo;
+                resultState.message = "视频信息更新成功";
                 return new JsonResult(resultState);
+
             }
-            recordVideo1.category = recordVideo.category;
-            recordVideo1.keyword = recordVideo.keyword;
-            _context.SaveChanges();
-            resultState.success = true;
-            resultState.code = 1;
-            resultState.value = recordVideo;
-            resultState.message = "视频信息更新成功";
             return new JsonResult(resultState);
+
+           
+            
         }
 
         /// <summary>
@@ -388,7 +424,7 @@ namespace live.Controllers
                 }
                 else
                 {
-                    return new ResultState(false, "无效cookie", 0, null);
+                    return new ResultState(false, "无效cookie,不存在操作用户", 0, null);
 
                 }
             }
