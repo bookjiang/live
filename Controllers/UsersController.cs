@@ -116,7 +116,38 @@ namespace live.Controllers
             return _context.Users.Any(e => e.name == name);
         }
 
+        private ResultState CheckCookie()
+        {
 
+            string s = _helper.GetCookie("token");
+            //DateTime dateTime = _helper
+            //尝试获取cookie的时间属性没有成功。
+
+            if (s == null)
+            {
+                return new ResultState(false, "请登录", 0, null);
+            }
+            var a = s.Split(",");
+            try
+            {
+                var user = _context.Users.Find(int.Parse(a[0]));
+                if (user != null)
+                {
+                    return new ResultState(true, "验证成功", 1, null);
+                }
+                else
+                {
+                    return new ResultState(false, "无效cookie,不存在操作用户", 0, null);
+
+                }
+            }
+            catch (Exception e)
+            {
+                return new ResultState(false, "无效cookie", 0, null);
+            }
+
+
+        }
 
         /// <summary>
         /// 用户注册
@@ -319,6 +350,9 @@ namespace live.Controllers
         public JsonResult delete(int id)
         {
 
+            String s = _helper.GetCookie("token");
+            var a = s.Split(",");
+            int userId = int.Parse(a[0]);
 
             ResultState resultState = CheckCookie();
             if (resultState.code == 1)
@@ -330,6 +364,11 @@ namespace live.Controllers
                     resultState.message = "用户不存在";
 
                     return new JsonResult(resultState);
+                }
+                if(user.id!=userId)
+                {
+                    return new JsonResult(new ResultState(false, "非法操作，不能删除其他用户", 0, user));
+
                 }
 
                 _context.Users.Remove(user);
@@ -406,33 +445,28 @@ namespace live.Controllers
 
         }
 
-        private ResultState CheckCookie()
+
+        [HttpGet("refresh")]
+        public JsonResult refresh()
         {
-
-            string s = _helper.GetCookie("token");
-            if (s == null)
+            ResultState resultState = CheckCookie();
+            if (resultState.code == 1)
             {
-                return new ResultState(false, "请登录", 0, null);
-            }
-            var a = s.Split(",");
-            try
-            {
-                var user = _context.Users.Find(int.Parse(a[0]));
-                if (user != null)
-                {
-                    return new ResultState(true, "验证成功", 1, null); 
-                }
-                else
-                {
-                    return new ResultState(false, "无效cookie,不存在操作用户", 0, null);
+                string s = _helper.GetCookie("token");
+                _helper.SetCookie("token", s, 66);
+                return new JsonResult(new ResultState(true, "刷新成功", 1, _helper.GetCookie("token")));
 
-                }
             }
-            catch (Exception e)
-            {
-                return new ResultState(false, "无效cookie", 0, null);
-            }
+            return new JsonResult(resultState);
 
+
+        }
+
+        [HttpGet("logout/{id}")]
+        public JsonResult logout(int id)
+        {
+            _helper.DeleteCookie("token");
+            return new JsonResult(new ResultState(true, "注销成功", 1, id));
 
         }
 
