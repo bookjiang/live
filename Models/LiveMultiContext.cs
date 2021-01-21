@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using live.Models;
 
 namespace live.Models
 {
@@ -18,6 +19,7 @@ namespace live.Models
         public DbSet<RecordVideo> RecordVideos { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Keyword> KeyWords { get; set; }
+        public DbSet<live.Models.MusicSong> MusicSong { get; set; }
        
 
     }
