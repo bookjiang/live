@@ -22,5 +22,6 @@ namespace live.Models
         public DbSet<MusicUser> MusicUsers { get; set; }
         public DbSet<MusicSong> MusicSongs { get; set; }
         public DbSet<MusicSongList> MusicSongLists { get; set; }
+        public DbSet<MusicSongAndSongList> MusicSongAndSongLists { get; set; }
     }
 }

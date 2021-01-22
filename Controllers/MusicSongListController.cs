@@ -18,6 +18,7 @@ namespace live.Controllers
     {
         private LiveMultiContext _context;
         private ICookieHelper _helper;
+        private UploadFile _upload;
 
         public MusicSongListController(LiveMultiContext context,ICookieHelper helper)
         {
@@ -27,6 +28,52 @@ namespace live.Controllers
         }
 
 
+
+        /// <summary>
+        ///核验cookie，返回结果中包含身份，resultState.code:表示user.id
+        /// </summary>
+        /// <returns></returns>
+        private ResultState CheckCookie()
+        {
+
+            string s = _helper.GetCookie("token");
+            //DateTime dateTime = _helper
+            //尝试获取cookie的时间属性没有成功。
+
+            if (s == null)
+            {
+                return new ResultState(false, "请登录", 0, null);
+            }
+            var a = s.Split(",");
+            try
+            {
+                var user = _context.MusicUsers.Find(int.Parse(a[0]));
+                if (user != null)
+                {
+                    if(user.role==0)//表示管理员
+                    {
+                        return new ResultState(true, "管理员", user.id, null);
+                    }
+                    else 
+                    {
+                        return new ResultState(true, "用户", user.id, null);
+                    }
+
+                }
+                else
+                {
+                    return new ResultState(false, "无效cookie,不存在操作用户", 0, null);
+
+                }
+            }
+            catch (Exception e)
+            {
+                return new ResultState(false, "无效cookie", 0, null);
+            }
+
+
+        }
+
         /// <summary>
         /// 分页获取所有歌单列表
         /// </summary>
@@ -34,45 +81,83 @@ namespace live.Controllers
         [HttpPost("getSongList")]
         public JsonResult getSongList([FromBody] QueryParameters query)
         {
-            int count = _context.MusicSongLists.Count();
-            int pageSize1 = query.pageSize;
-            List<MusicSongList> temp = new List<MusicSongList>();
-            PageInfoList pageSongList = new PageInfoList();
-            if (query.pageIndex <= 0)
+            ResultState resultState = CheckCookie();
+            if (resultState.message == "管理员")  //管理员登录，可以获取所有歌单
             {
-                temp = (List<MusicSongList>)_context.MusicSongLists.Take(query.pageSize).ToList();
-                pageSongList.items = temp;
-                pageSongList.count = count;
-                pageSongList.pageIndex = 1;
-                pageSongList.pageSize = query.pageSize;
-            }
-            else if (query.pageSize * query.pageIndex > count)
-            {
-                temp = (List<MusicSongList>)_context.MusicSongLists.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
-                pageSongList.items = temp;
-                pageSongList.count = count;
-                pageSongList.pageIndex = count / query.pageSize + 1;
-                pageSongList.pageSize = query.pageSize;
-            }
-            else
-            {
-                temp = _context.MusicSongLists.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
-                pageSongList.items = temp;
-                pageSongList.count = count;
-                pageSongList.pageIndex = query.pageIndex;
-                pageSongList.pageSize = query.pageSize;
-            }
+                int count = _context.MusicSongLists.Count();
+                int pageSize1 = query.pageSize;
+                List<MusicSongList> temp = new List<MusicSongList>();
+                PageInfoList pageSongList = new PageInfoList();
+                if (query.pageIndex <= 0)
+                {
+                    temp = (List<MusicSongList>)_context.MusicSongLists.Take(query.pageSize).ToList();
+                    pageSongList.items = temp;
+                    pageSongList.count = count;
+                    pageSongList.pageIndex = 1;
+                    pageSongList.pageSize = query.pageSize;
+                }
+                else if (query.pageSize * query.pageIndex > count)
+                {
+                    temp = (List<MusicSongList>)_context.MusicSongLists.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                    pageSongList.items = temp;
+                    pageSongList.count = count;
+                    pageSongList.pageIndex = count / query.pageSize + 1;
+                    pageSongList.pageSize = query.pageSize;
+                }
+                else
+                {
+                    temp = _context.MusicSongLists.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                    pageSongList.items = temp;
+                    pageSongList.count = count;
+                    pageSongList.pageIndex = query.pageIndex;
+                    pageSongList.pageSize = query.pageSize;
+                }
 
-            //PageInfoList<User> pageUsers = new PageInfoList<User>(temp, count, query.pageIndex, query.pageSize);
-            //pageUsers.items = temp;
-            //pageUsers.count = count;
-            //pageUsers.pageIndex = query.pageIndex;
-            //pageUsers.pageSize = query.pageSize;
-            ResultState resultState = new ResultState();
-            resultState.success = true;
-            resultState.message = "查询成功";
-            resultState.value = pageSongList;
+                resultState.success = true;
+                resultState.message = "查询成功";
+                resultState.value = pageSongList;
+                return new JsonResult(resultState);
+
+            }
+            else if(resultState.message=="用户")//用户登录，只能获取公有歌单
+            {
+                int count = _context.MusicSongLists.Count();
+                int pageSize1 = query.pageSize;
+                List<MusicSongList> temp = new List<MusicSongList>();
+                PageInfoList pageSongList = new PageInfoList();
+                if (query.pageIndex <= 0)
+                {
+                    temp = (List<MusicSongList>)_context.MusicSongLists.Where(x=> x.status==1).Take(query.pageSize).ToList();
+                    pageSongList.items = temp;
+                    pageSongList.count = count;
+                    pageSongList.pageIndex = 1;
+                    pageSongList.pageSize = query.pageSize;
+                }
+                else if (query.pageSize * query.pageIndex > count)
+                {
+                    temp = (List<MusicSongList>)_context.MusicSongLists.Where(x => x.status == 1).Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                    pageSongList.items = temp;
+                    pageSongList.count = count;
+                    pageSongList.pageIndex = count / query.pageSize + 1;
+                    pageSongList.pageSize = query.pageSize;
+                }
+                else
+                {
+                    temp = _context.MusicSongLists.Where(x => x.status == 1).Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                    pageSongList.items = temp;
+                    pageSongList.count = count;
+                    pageSongList.pageIndex = query.pageIndex;
+                    pageSongList.pageSize = query.pageSize;
+                }
+
+                resultState.success = true;
+                resultState.message = "查询成功";
+                resultState.value = pageSongList;
+                return new JsonResult(resultState);
+            }
             return new JsonResult(resultState);
+
+          
         }
 
 
@@ -85,61 +170,230 @@ namespace live.Controllers
         [HttpPost("getSongListByUserId/{id}")]
         public JsonResult getSongListByUserId([FromBody] QueryParameters query,int id)
         {
-            int count = _context.MusicSongLists.Where(x => x.user_id == id).Count();
-            int pageSize1 = query.pageSize;
-            List<MusicSongList> temp = new List<MusicSongList>();
-            PageInfoList pageSongList = new PageInfoList();
-            if (query.pageIndex <= 0)
-            {
-                temp = (List<MusicSongList>)_context.MusicSongLists.Where(x=>x.user_id==id).Take(query.pageSize).ToList();
-                pageSongList.items = temp;
-                pageSongList.count = count;
-                pageSongList.pageIndex = 1;
-                pageSongList.pageSize = query.pageSize;
-            }
-            else if (query.pageSize * query.pageIndex > count)
-            {
-                temp = (List<MusicSongList>)_context.MusicSongLists.Where(x => x.user_id == id).Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
-                pageSongList.items = temp;
-                pageSongList.count = count;
-                pageSongList.pageIndex = count / query.pageSize + 1;
-                pageSongList.pageSize = query.pageSize;
-            }
-            else
-            {
-                temp = _context.MusicSongLists.Where(x => x.user_id == id).Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
-                pageSongList.items = temp;
-                pageSongList.count = count;
-                pageSongList.pageIndex = query.pageIndex;
-                pageSongList.pageSize = query.pageSize;
-            }
 
-            //PageInfoList<User> pageUsers = new PageInfoList<User>(temp, count, query.pageIndex, query.pageSize);
-            //pageUsers.items = temp;
-            //pageUsers.count = count;
-            //pageUsers.pageIndex = query.pageIndex;
-            //pageUsers.pageSize = query.pageSize;
-            ResultState resultState = new ResultState();
-            resultState.success = true;
-            resultState.message = "查询成功";
-            resultState.value = pageSongList;
+            ResultState resultState = CheckCookie();
+            if(resultState.message=="管理员" || resultState.code==id)
+            {
+                int count = _context.MusicSongLists.Where(x => x.user_id == id).Count();
+                int pageSize1 = query.pageSize;
+                List<MusicSongList> temp = new List<MusicSongList>();
+                PageInfoList pageSongList = new PageInfoList();
+                if (query.pageIndex <= 0)
+                {
+                    temp = (List<MusicSongList>)_context.MusicSongLists.Where(x => x.user_id == id).Take(query.pageSize).ToList();
+                    pageSongList.items = temp;
+                    pageSongList.count = count;
+                    pageSongList.pageIndex = 1;
+                    pageSongList.pageSize = query.pageSize;
+                }
+                else if (query.pageSize * query.pageIndex > count)
+                {
+                    temp = (List<MusicSongList>)_context.MusicSongLists.Where(x => x.user_id == id).Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                    pageSongList.items = temp;
+                    pageSongList.count = count;
+                    pageSongList.pageIndex = count / query.pageSize + 1;
+                    pageSongList.pageSize = query.pageSize;
+                }
+                else
+                {
+                    temp = _context.MusicSongLists.Where(x => x.user_id == id).Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                    pageSongList.items = temp;
+                    pageSongList.count = count;
+                    pageSongList.pageIndex = query.pageIndex;
+                    pageSongList.pageSize = query.pageSize;
+                }
+                //ResultState resultState = new ResultState();
+                resultState.success = true;
+                resultState.message = "查询成功";
+                resultState.value = pageSongList;
+                return new JsonResult(resultState);
+            }
+            else if (resultState.code != 0)//说明用户非法操作
+            {
+                return new JsonResult(new ResultState(false, "用户操作非法，不能通过id获取其他用户歌单", 1, null));
+            }
             return new JsonResult(resultState);
+
 
         }
 
         //增加歌单
         //TODO
+        /// <summary>
+        /// 增加歌单
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="name"></param>
+        /// <param name="describe"></param>
+        /// <param name="user_id"></param>
+        /// <returns></returns>
+        [HttpPost("addSongList")]
+        public JsonResult addSongList(IFormFileCollection file, [FromForm] string name, [FromForm] string describe, [FromForm] int user_id, [FromForm] int status=1)
+        {
+            MusicSongList musicSongList = new MusicSongList();
+            musicSongList.name = name;
+            musicSongList.describe = describe;
+            musicSongList.user_id = user_id;
+            musicSongList.status = status;//默认公有
+            ResultState resultState = CheckCookie();
+            if (resultState.message == "管理员" || resultState.code == musicSongList.user_id)
+            {
+                MusicSongList musicSongList1 = _context.MusicSongLists.Where(x => (x.user_id == musicSongList.user_id && x.name == musicSongList.name)).FirstOrDefault();
+                if (musicSongList1 != null)
+                {
+                    return new JsonResult(new ResultState(false, "歌单已存在", 0, musicSongList));
+
+                }
+                List<String> urls = _upload.uploadFile(file);
+                if(urls[0]=="null")
+                {
+                    musicSongList.cover_url = "null";
+                }    
+                else if(urls[0]=="error")
+                {
+                    return new JsonResult(new ResultState(false, "封面上传失败", 0, musicSongList));
+
+                } 
+                else
+                {
+                    musicSongList.cover_url = urls[0];
+                }
+
+
+
+                _context.MusicSongLists.Add(musicSongList);
+                _context.SaveChanges();
+                return new JsonResult(new ResultState(true, "添加成功", 1, musicSongList));
+            }
+            else if(resultState.code!=0)//说明用户非法操作
+            {
+                return new JsonResult(new ResultState(false, "用户操作非法，不能给别的用户添加歌单", 1, musicSongList));
+            }
+
+            return new JsonResult(resultState);
+
+
+        }
+
 
         //删除歌单
         //TODO
+        /// <summary>
+        /// 删除歌单
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("deleteSongList/{id}")]
+        public JsonResult deleteSongList(int id)
+        {
+            ResultState resultState = CheckCookie();
+            MusicSongList musicSongList = _context.MusicSongLists.Find(id);
+            if (resultState.message == "管理员" || resultState.code == musicSongList.user_id)
+            {
+                _context.MusicSongLists.Remove(musicSongList);
+                List<MusicSongAndSongList> list = _context.MusicSongAndSongLists.Where(x => x.song_list_id == musicSongList.id).ToList();
+                _context.MusicSongAndSongLists.RemoveRange(list);//同步删除关联表中的数据
+                _context.SaveChanges();
+
+            }
+            else if (resultState.code != 0)//说明用户非法操作
+            {
+                return new JsonResult(new ResultState(false, "用户操作非法，不能删除别的用户歌单", 1, musicSongList));
+            }
+
+            return new JsonResult(resultState);
+        }
+
+
+
+
 
         //改歌单
         //TODO
+        /// <summary>
+        /// 修改歌单
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <param name="describe"></param>
+        /// <param name="user_id"></param>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        [HttpPut("updateSongList")]
+        public JsonResult updateSongList(IFormFileCollection file, [FromForm] int id,[FromForm] string name, [FromForm] string describe, [FromForm] int user_id, [FromForm] int status)
+        {
+
+            MusicSongList musicSongList = _context.MusicSongLists.Find(id);
+            if (musicSongList == null)
+            {
+                return new JsonResult(new ResultState(false, "歌单不存在", 0, musicSongList));
+
+            }
+            musicSongList.name = name;
+            musicSongList.describe = describe;
+            musicSongList.user_id = user_id;
+            musicSongList.status = status;
+            ResultState resultState = CheckCookie();
+            if (resultState.message == "管理员" || resultState.code == musicSongList.user_id)
+            {
+                //MusicSongList musicSongList1 = _context.MusicSongLists.Where(x => (x.user_id == musicSongList.user_id && x.name == musicSongList.name)).FirstOrDefault();
+                
+                List<String> urls = _upload.uploadFile(file);
+                if (urls[0] == "null")
+                {
+                    musicSongList.cover_url = "null";
+                }
+                else if (urls[0] == "error")
+                {
+                    return new JsonResult(new ResultState(false, "封面上传失败", 0, musicSongList));
+
+                }
+                else
+                {
+                    musicSongList.cover_url = urls[0];
+                }
+
+
+
+                _context.MusicSongLists.Update(musicSongList);
+                _context.SaveChanges();
+                return new JsonResult(new ResultState(true, "添加成功", 1, musicSongList));
+            }
+            else if (resultState.code != 0)//说明用户非法操作
+            {
+                return new JsonResult(new ResultState(false, "用户操作非法，不能给别的用户添加歌单", 1, musicSongList));
+            }
+
+            return new JsonResult(resultState);
+
+
+        }
+
+
+
+
 
 
         //通过歌单id分页索取其列表中歌曲详细信息
         //TODO
+        /// <summary>
+        /// 通过歌单id分页索取其列表中歌曲详细信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("getSongs/{id}")]
+        public JsonResult getSongs(int id)
+        {
+            //ResultState resultState = CheckCookie();
+            //if(resultState.code!=0)
+            //{
+            List<MusicSong> musicSongs1 = _context.MusicSongs.Join(_context.MusicSongAndSongLists.Where(x => x.song_list_id == id), musicSongs => musicSongs.id, musicSongAndSongList => musicSongAndSongList.song_id, (musicSongs, musicSongAndSongList) => new MusicSong(musicSongs.id, musicSongs.name,musicSongs.album,musicSongs.artists,musicSongs.lyric,musicSongs.play_url,musicSongs.cover_post)).ToList();
+                return new JsonResult(new ResultState(true, "查询成功", 1, musicSongs1));
 
+           //}
+            //return new JsonResult(resultState);
+        }
 
 
     }
