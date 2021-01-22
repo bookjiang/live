@@ -16,7 +16,7 @@ namespace live.Models
         /// </summary>
         public MusicUser()
         {
-
+            this.role = 1;
         }
 
         [Key]
