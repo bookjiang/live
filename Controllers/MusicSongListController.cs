@@ -382,17 +382,81 @@ namespace live.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("getSongs/{id}")]
-        public JsonResult getSongs(int id)
+        [HttpPost("getSongs/{id}")]
+        public JsonResult getSongs([FromBody] QueryParameters query,int id)
         {
-            //ResultState resultState = CheckCookie();
-            //if(resultState.code!=0)
-            //{
-            List<MusicSong> musicSongs1 = _context.MusicSongs.Join(_context.MusicSongAndSongLists.Where(x => x.song_list_id == id), musicSongs => musicSongs.id, musicSongAndSongList => musicSongAndSongList.song_id, (musicSongs, musicSongAndSongList) => new MusicSong(musicSongs.id, musicSongs.name,musicSongs.album,musicSongs.artists,musicSongs.lyric,musicSongs.play_url,musicSongs.cover_post)).ToList();
-                return new JsonResult(new ResultState(true, "查询成功", 1, musicSongs1));
+            ResultState resultState = CheckCookie();
+            if(resultState.code!=0)
+            {
 
-           //}
-            //return new JsonResult(resultState);
+            int count = _context
+                .MusicSongs
+                .Join(_context.MusicSongAndSongLists.Where(x => x.song_list_id == id), musicSongs => musicSongs.id, musicSongAndSongList => musicSongAndSongList.song_id, (musicSongs, musicSongAndSongList) => new MusicSong(musicSongs.id, musicSongs.name, musicSongs.album, musicSongs.artists, musicSongs.lyric, musicSongs.play_url, musicSongs.cover_post))
+                .Count();
+            int pageSize1 = query.pageSize;
+            List<MusicSong> temp = new List<MusicSong>();
+            PageInfoList pageSongList = new PageInfoList();
+            if (query.pageIndex <= 0)
+            {
+                //temp = (List<MusicSong>)_context.MusicSongLists.Where(x => x.user_id == id).Take(query.pageSize).ToList();
+                temp=(List<MusicSong>)_context
+                .MusicSongs
+                .Join(_context.MusicSongAndSongLists.Where(x => x.song_list_id == id), musicSongs => musicSongs.id, musicSongAndSongList => musicSongAndSongList.song_id, (musicSongs, musicSongAndSongList) => new MusicSong(musicSongs.id, musicSongs.name, musicSongs.album, musicSongs.artists, musicSongs.lyric, musicSongs.play_url, musicSongs.cover_post))
+                .Take(query.pageSize)
+                .ToList();
+                pageSongList.items = temp;
+                pageSongList.count = count;
+                pageSongList.pageIndex = 1;
+                pageSongList.pageSize = query.pageSize;
+            }
+            else if (query.pageSize * query.pageIndex > count)
+            {
+                //temp = (List<MusicSongList>)_context.MusicSongLists.Where(x => x.user_id == id).Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                temp = (List<MusicSong>)_context
+                .MusicSongs
+                .Join(_context.MusicSongAndSongLists.Where(x => x.song_list_id == id), musicSongs => musicSongs.id, musicSongAndSongList => musicSongAndSongList.song_id, (musicSongs, musicSongAndSongList) => new MusicSong(musicSongs.id, musicSongs.name, musicSongs.album, musicSongs.artists, musicSongs.lyric, musicSongs.play_url, musicSongs.cover_post))
+                .Skip(count - (count % query.pageSize))
+                .Take((count % query.pageSize))
+                .ToList();
+
+                pageSongList.items = temp;
+                pageSongList.count = count;
+                pageSongList.pageIndex = count / query.pageSize + 1;
+                pageSongList.pageSize = query.pageSize;
+            }
+            else
+            {
+                //temp = _context.MusicSongLists.Where(x => x.user_id == id).Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                temp = (List<MusicSong>)_context
+                    .MusicSongs
+                    .Join(_context.MusicSongAndSongLists.Where(x => x.song_list_id == id), musicSongs => musicSongs.id, musicSongAndSongList => musicSongAndSongList.song_id, (musicSongs, musicSongAndSongList) => new MusicSong(musicSongs.id, musicSongs.name, musicSongs.album, musicSongs.artists, musicSongs.lyric, musicSongs.play_url, musicSongs.cover_post))
+                    .Skip((query.pageIndex - 1) * query.pageSize)
+                    .Take(query.pageSize)
+                    .ToList();
+
+
+                pageSongList.items = temp;
+                pageSongList.count = count;
+                pageSongList.pageIndex = query.pageIndex;
+                pageSongList.pageSize = query.pageSize;
+            }
+            //ResultState resultState = new ResultState();
+            resultState.success = true;
+            resultState.message = "查询成功";
+            resultState.value = pageSongList;
+            return new JsonResult(resultState);
+
+
+
+
+            //List<MusicSong> musicSongs1 = _context
+            //    .MusicSongs
+            //    .Join(_context.MusicSongAndSongLists.Where(x => x.song_list_id == id), musicSongs => musicSongs.id, musicSongAndSongList => musicSongAndSongList.song_id, (musicSongs, musicSongAndSongList) => new MusicSong(musicSongs.id, musicSongs.name,musicSongs.album,musicSongs.artists,musicSongs.lyric,musicSongs.play_url,musicSongs.cover_post))
+            //    .ToList();
+            //    return new JsonResult(new ResultState(true, "查询成功", 1, musicSongs1));
+
+           }
+            return new JsonResult(resultState);
         }
 
 

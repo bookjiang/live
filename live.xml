@@ -205,7 +205,7 @@
             <param name="status"></param>
             <returns></returns>
         </member>
-        <member name="M:live.Controllers.MusicSongListController.getSongs(System.Int32)">
+        <member name="M:live.Controllers.MusicSongListController.getSongs(live.Models.QueryParameters,System.Int32)">
             <summary>
             通过歌单id分页索取其列表中歌曲详细信息
             </summary>
