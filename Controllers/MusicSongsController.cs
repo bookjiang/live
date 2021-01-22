@@ -143,6 +143,13 @@ namespace live.Controllers
         [HttpGet]
         public async Task<JsonResult> GetMusicSong([FromQuery] int? pageIndex, [FromQuery] int? pageSize)
         {
+            ResultState resultState = CheckCookie();
+
+            if (resultState.code == 0)
+            {
+                return new JsonResult(resultState);
+            }
+
             if (pageIndex == null)
             {
                 pageIndex = 1;
@@ -232,6 +239,12 @@ namespace live.Controllers
         [HttpGet("{id}")]
         public JsonResult GetSong(int id)
         {
+            ResultState resultState = CheckCookie();
+
+            if (resultState.code == 0)
+            {
+                return new JsonResult(resultState);
+            }
             var song = _context.MusicSongs.Find(id);
             if(song == null)
             {
@@ -297,6 +310,12 @@ namespace live.Controllers
         [HttpDelete("DeleteSong/{id}")]
         public JsonResult DeleteSong(int id)
         {
+            ResultState resultState = CheckCookie();
+
+            if (resultState.code == 0)
+            {
+                return new JsonResult(resultState);
+            }
             var song = _context.MusicSongs.Find(id);
             if(song == null)
             {
@@ -325,7 +344,13 @@ namespace live.Controllers
         [HttpPut("UpdateSongTextInfo/{id}")]
         public JsonResult UpdateSongTextInfo(int id, MusicSong musicSong)
         {
-            if(id != musicSong.id)
+            ResultState resultState = CheckCookie();
+
+            if (resultState.code == 0)
+            {
+                return new JsonResult(resultState);
+            }
+            if (id != musicSong.id)
             {
                 return new JsonResult(new ResultState(false, "请检查参数", 0, null));
             }
@@ -391,9 +416,15 @@ namespace live.Controllers
         public JsonResult AddSong([FromForm] IFormFileCollection file, [FromForm] string name, [FromForm] string album, 
             [FromForm] string artists, [FromForm] string lyric)
         {
+            ResultState resultState = CheckCookie();
+
+            if (resultState.code == 0)
+            {
+                return new JsonResult(resultState);
+            }
             //如果文件为空，返回错误信息
 
-            if(file == null)
+            if (file == null)
             {
                 return new JsonResult(new ResultState(false, "未添加文件", 0, null));
             }
