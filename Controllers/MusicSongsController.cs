@@ -16,18 +16,14 @@ namespace live.Controllers
     {
         private readonly LiveMultiContext _context;
         private readonly ICookieHelper _helper;
+        //private InputFile inputfile = new InputFile();
 
         public MusicSongsController(LiveMultiContext context, ICookieHelper helper)
         {
             _context = context;
             _helper = helper;
         }
-        //// GET: api/MusicSongs
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<MusicSong>>> GetMusicSong()
-        //{
-        //    return await _context.MusicSong.ToListAsync();
-        //}
+
 
         //// GET: api/MusicSongs/5
         //[HttpGet("{id}")]
@@ -103,10 +99,10 @@ namespace live.Controllers
         //    return musicSong;
         //}
 
-        //private bool MusicSongExists(int id)
-        //{
-        //    return _context.MusicSong.Any(e => e.id == id);
-        //}
+        private bool MusicSongExists(int id)
+        {
+            return _context.MusicSongs.Any(e => e.id == id);
+        }
         private ResultState CheckCookie()
         {
 
@@ -137,30 +133,299 @@ namespace live.Controllers
 
         }
 
+        //// GET: api/MusicSongs
+        /// <summary>
+        /// 获取所有评论(可以在查询字符串中设置pageSize和pageIndex,不设置的话，默认pageIndex=1,pageSize=5)
+        /// </summary>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<JsonResult> GetMusicSong([FromQuery] int? pageIndex, [FromQuery] int? pageSize)
+        {
+            if (pageIndex == null)
+            {
+                pageIndex = 1;
+            }
+            if (pageSize == null || pageSize <= 0)
+            {
+                pageSize = 5;
+            }
+
+            //int pageSize = 5;
+
+            var count = await _context.MusicSongs.CountAsync();
+
+            List<MusicSong> list;
+            try
+            {
+                if (pageIndex <= 0)
+                {
+                    pageIndex = 1;
+                    list = await _context.MusicSongs.Take((int)pageSize).ToListAsync();
+
+                }
+                else if (pageSize * pageIndex > count)
+                {
+                    list = await _context.MusicSongs.Skip((int)(count - (count % pageSize))).Take((int)(count % pageSize)).ToListAsync();
+                }
+                else
+                {
+                    list = await _context.MusicSongs.Skip((int)((pageIndex - 1) * pageSize)).Take((int)pageSize).ToListAsync();
+                }
+                
+            }
+            catch
+            {
+                return new JsonResult(new ResultState(false, "获取歌曲列表失败", 0, null));
+            }
+
+            return new JsonResult(new ResultState(true, "获取歌曲列表成功", 1, list));
+        }
+ 
+
         /// <summary>
         /// 添加歌曲
         /// </summary>
         /// <param name="song"></param>
         /// <returns></returns>
-        [HttpPost]
-        public JsonResult AddSong([FromBody] MusicSong song)
-        {
-            if(song != null)
-            {
-                try {
-                    _context.Add(song);
-                    _context.SaveChanges();
-                    return new JsonResult(new ResultState(true, "添加成功", 1, song));
-                }
-                catch
-                {
-                    return new JsonResult(new ResultState(false, "发生一个异常，添加歌曲失败", 1, song));
-                }
-                
-            }
-            return new JsonResult(new ResultState(false, "一个异常发生，添加失败", 1, song));
+        //[HttpPost("AddSong")]
+        //public JsonResult AddSong([FromBody] MusicSong song)
+        //{
+        //    if(song != null)
+        //    {
+        //        try {
+        //            var sameSong = _context.MusicSongs.
+        //                Where(c => c.name == song.name && c.album == song.album && c.artists == song.artists).
+        //                FirstOrDefault();
 
+        //            if (sameSong == null)
+        //            {
+        //                _context.Add(song);
+        //                _context.SaveChanges();
+
+        //                var addsong = _context.MusicSongs.
+        //                    Where(c => c.name == song.name && c.album == song.album && c.artists == song.artists).
+        //                    FirstOrDefault();
+
+        //                return new JsonResult(new ResultState(true, "添加成功", 1, addsong));
+
+        //            }
+        //            return new JsonResult(new ResultState(false, "添加失败，歌曲库中已存在改该歌曲", 0, sameSong));
+
+        //        }
+        //        catch
+        //        {
+        //            return new JsonResult(new ResultState(false, "发生异常，添加歌曲失败", 0, song));
+        //        }
+                
+        //    }
+        //    return new JsonResult(new ResultState(false, "添加失败，请检查请求体参数", 0, song));
+        //}
+
+
+        /// <summary>
+        /// 通过id查询歌曲
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public JsonResult GetSong(int id)
+        {
+            var song = _context.MusicSongs.Find(id);
+            if(song == null)
+            {
+                return new JsonResult(new ResultState(false, "未查询到该歌曲", 0, null));
+            }
+            return new JsonResult(new ResultState(true,"查询成功", 1, song));
+        }
+
+        /// <summary>
+        /// 通过查询Query String筛选歌曲列表
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="artists"></param>
+        /// <returns></returns>
+        [HttpGet("GetSongs")]
+        public JsonResult GetSongs([FromQuery] string name, [FromQuery] string artists)
+        {
+            if (name == null && artists == null)
+            {
+                return new JsonResult(new ResultState(false, "请设置查询条件", 0, null));
+            }
+
+            else if (name == null && artists != null)
+            {
+                var songs = _context.MusicSongs.Where(s => s.artists.Contains(artists)).ToList();
+                if (songs.Count() == 0)
+                {
+                    return new JsonResult(new ResultState(true, "曲库中未包含符合条件的歌曲", 1, null));
+                }
+
+                return new JsonResult(new ResultState(true, "查询成功", 0, songs));
+            }
+            else if (name != null && artists == null)
+            {
+                var songs = _context.MusicSongs.Where(s => s.name.Contains(name)).ToList();
+                if (songs.Count() == 0)
+                {
+                    return new JsonResult(new ResultState(true, "曲库中未包含符合条件的歌曲", 1, null));
+                }
+
+                return new JsonResult(new ResultState(true, "查询成功", 1, songs));
+            }
+            else
+            {
+                var songs = _context.MusicSongs.Where(s => s.name.Contains(name) && s.artists.Contains(artists)).ToList();
+                if (songs.Count() == 0)
+                {
+                    return new JsonResult(new ResultState(true, "曲库中未包含符合条件的歌曲", 1, null));
+                }
+                return new JsonResult(new ResultState(true, "查询成功", 1, songs));
+            }
 
         }
+
+
+
+
+        /// <summary>
+        /// 根据id删除歌曲
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("DeleteSong/{id}")]
+        public JsonResult DeleteSong(int id)
+        {
+            var song = _context.MusicSongs.Find(id);
+            if(song == null)
+            {
+                return new JsonResult(new ResultState(true, "曲库中不存在该歌曲", 1, null));
+            }
+            try
+            {
+                _context.MusicSongs.Remove(song);
+                _context.SaveChanges();
+                return new JsonResult(new ResultState(true, "删除歌曲成功", 1, song));
+            }
+            catch
+            {
+                return new JsonResult(new ResultState(false, "删除歌曲失败", 0, null));
+            }
+        }
+
+
+
+        /// <summary>
+        /// 修改歌曲文本信息
+        /// </summary>
+        /// <param name="id">歌曲的id属性</param>
+        /// <param name="musicSong">歌曲json对象</param>
+        /// <returns></returns>
+        [HttpPut("UpdateSongTextInfo/{id}")]
+        public JsonResult UpdateSongTextInfo(int id, MusicSong musicSong)
+        {
+            if(id != musicSong.id)
+            {
+                return new JsonResult(new ResultState(false, "请检查参数", 0, null));
+            }
+            
+            var song = _context.MusicSongs.Find(id);
+            if(song == null)
+            {
+                return new JsonResult(new ResultState(false, "修改信息失败", 0, null));
+            }
+            //  var properties = typeof(MusicSong).GetProperties();
+            //  foreach (System.Reflection.PropertyInfo info in properties)
+            //  {
+
+            //  }
+
+            //  暂时未发现什么好办法修改属性
+            if (musicSong.name != null)
+            {
+                song.name = musicSong.name;
+            }
+            if (musicSong.album != null)
+            {
+                song.album = musicSong.album;
+            }
+            if (musicSong.artists != null)
+            {
+                song.artists = musicSong.artists;
+            }
+            if (musicSong.lyric != null)
+            {
+                song.lyric = musicSong.lyric;
+            }
+            if (musicSong.play_url != null)
+            {
+                song.play_url = musicSong.play_url;
+            }
+            if (musicSong.cover_post != null)
+            {
+                song.cover_post = musicSong.cover_post;
+            }
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch
+            {
+                return new JsonResult(new ResultState(false, "修改失败", 0, musicSong));
+            }
+
+            return new JsonResult(new ResultState(true,"修改成功",1,song));
+        }
+
+        /// <summary>
+        /// 上传音乐
+        /// </summary>
+        /// <param name="file">音乐本体（mp3格式）与封面文件（key名称必须都为file）</param>
+        /// <param name="name">音乐名称</param>
+        /// <param name="album">专辑名称</param>
+        /// <param name="artists">演唱者</param>
+        /// <param name="lyric">歌词</param>
+        /// <returns></returns>
+        [HttpPost("AddSong")]
+        public JsonResult AddSong([FromForm] IFormFileCollection file, [FromForm] string name, [FromForm] string album, 
+            [FromForm] string artists, [FromForm] string lyric)
+        {
+            //如果文件为空，返回错误信息
+
+            if(file == null)
+            {
+                return new JsonResult(new ResultState(false, "未添加文件", 0, null));
+            }
+
+            List<String> urls = InputFile.inputFile(file);
+            try
+            {
+                if (urls[0] == "null")
+                {
+                  
+                    return new JsonResult(new ResultState(false, "文件参数异常", 0, null));
+                }
+                else if (urls[0] == "error")
+                {
+                    return new JsonResult(new ResultState(false, "音乐上传失败", 0, null));
+
+                }
+                else
+                {
+                    var song = new MusicSong(name,album,artists,lyric,urls[0],urls[1]);
+                    _context.MusicSongs.Add(song);
+                    _context.SaveChanges();
+                    return new JsonResult(new ResultState(true, "上传成功", 1, song));
+                }
+
+            }
+            catch
+            {
+                return new JsonResult(new ResultState(false, "上传失败", 0, null));
+            }
+
+        }
+            
     }
 }
