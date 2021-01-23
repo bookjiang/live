@@ -18,7 +18,7 @@ namespace live.Controllers
     {
         private LiveMultiContext _context;
         private ICookieHelper _helper;
-        private UploadFile _upload;
+        private UploadFile _upload=new UploadFile();
 
         public MusicSongListController(LiveMultiContext context,ICookieHelper helper)
         {
@@ -75,7 +75,7 @@ namespace live.Controllers
         }
 
         /// <summary>
-        /// 分页获取所有歌单列表
+        /// 分页获取所有歌单列表，用户和管理员调用一个接口，后台可以判断角色
         /// </summary>
         /// <returns></returns>
         [HttpPost("getSongList")]
@@ -121,7 +121,7 @@ namespace live.Controllers
             }
             else if(resultState.message=="用户")//用户登录，只能获取公有歌单
             {
-                int count = _context.MusicSongLists.Count();
+                int count = _context.MusicSongLists.Where(x => x.status == 1).Count();
                 int pageSize1 = query.pageSize;
                 List<MusicSongList> temp = new List<MusicSongList>();
                 PageInfoList pageSongList = new PageInfoList();
@@ -217,10 +217,9 @@ namespace live.Controllers
 
         }
 
-        //增加歌单
-        //TODO
+
         /// <summary>
-        /// 增加歌单
+        /// 增加歌单，表单提交
         /// </summary>
         /// <param name="file"></param>
         /// <param name="name"></param>
@@ -276,10 +275,9 @@ namespace live.Controllers
         }
 
 
-        //删除歌单
-        //TODO
+
         /// <summary>
-        /// 删除歌单
+        /// 删除歌单，用户和管理员调用一个接口，后台可以判断角色
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -290,8 +288,9 @@ namespace live.Controllers
             MusicSongList musicSongList = _context.MusicSongLists.Find(id);
             if (resultState.message == "管理员" || resultState.code == musicSongList.user_id)
             {
-                _context.MusicSongLists.Remove(musicSongList);
+                
                 List<MusicSongAndSongList> list = _context.MusicSongAndSongLists.Where(x => x.song_list_id == musicSongList.id).ToList();
+                _context.MusicSongLists.Remove(musicSongList);
                 _context.MusicSongAndSongLists.RemoveRange(list);//同步删除关联表中的数据
                 _context.SaveChanges();
 
@@ -308,10 +307,8 @@ namespace live.Controllers
 
 
 
-        //改歌单
-        //TODO
         /// <summary>
-        /// 修改歌单
+        /// 修改歌单，操作者没有修改的属性请赋原值传递给后端
         /// </summary>
         /// <param name="file"></param>
         /// <param name="id"></param>
@@ -375,8 +372,7 @@ namespace live.Controllers
 
 
 
-        //通过歌单id分页索取其列表中歌曲详细信息
-        //TODO
+
         /// <summary>
         /// 通过歌单id分页索取其列表中歌曲详细信息
         /// </summary>
@@ -456,6 +452,28 @@ namespace live.Controllers
             //    return new JsonResult(new ResultState(true, "查询成功", 1, musicSongs1));
 
            }
+            return new JsonResult(resultState);
+        }
+
+
+        /// <summary>
+        /// 歌单添加歌曲
+        /// </summary>
+        /// <param name="song_id"></param>
+        /// <param name="song_list_id"></param>
+        /// <returns></returns>
+        [HttpPost("addSongAndSongList")]
+        public JsonResult addSongAndSongList([FromForm] int song_id,[FromForm] int song_list_id)
+        {
+            ResultState resultState = CheckCookie();
+            if (resultState.code != 0)
+            {
+                MusicSongAndSongList musicSongAndSongList = new MusicSongAndSongList();
+                musicSongAndSongList.song_id = song_id;
+                musicSongAndSongList.song_list_id = song_list_id;
+                _context.Add(musicSongAndSongList);
+                _context.SaveChanges();
+            }
             return new JsonResult(resultState);
         }
 
