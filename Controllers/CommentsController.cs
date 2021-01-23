@@ -286,7 +286,8 @@ namespace live.Controllers
 
             if (resultState.code == 0)
             {
-                return new JsonResult(resultState);            }
+                return new JsonResult(resultState);            
+            }
 
             return new JsonResult(_context.Comments.Find(id));
         }
