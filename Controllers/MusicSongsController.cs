@@ -403,19 +403,24 @@ namespace live.Controllers
             return new JsonResult(new ResultState(true,"修改成功",1,song));
         }
 
-        /// <summary>
-        /// 上传音乐
-        /// </summary>
-        /// <param name="file">音乐本体（mp3格式）与封面文件（key名称必须都为file）</param>
-        /// <param name="name">音乐名称</param>
-        /// <param name="album">专辑名称</param>
-        /// <param name="artists">演唱者</param>
-        /// <param name="lyric">歌词</param>
-        /// <returns></returns>
+     /// <summary>
+     /// 上传歌曲
+     /// </summary>
+     /// <param name="MusicFile">音乐本体文件</param>
+     /// <param name="PictureFile">音乐封面图片</param>
+     /// <param name="name"></param>
+     /// <param name="album"></param>
+     /// <param name="artists"></param>
+     /// <param name="lyric"></param>
+     /// <returns></returns>
         [HttpPost("AddSong")]
-        public JsonResult AddSong([FromForm] IFormFileCollection file, [FromForm] string name, [FromForm] string album, 
+        public JsonResult AddSong([FromForm] IFormFileCollection MusicFile, [FromForm] IFormFileCollection PictureFile,
+            [FromForm] string name, [FromForm] string album, 
             [FromForm] string artists, [FromForm] string lyric)
         {
+            
+            var file1 = MusicFile;
+            var file2 = PictureFile;
             ResultState resultState = CheckCookie();
 
             if (resultState.code == 0)
@@ -424,27 +429,30 @@ namespace live.Controllers
             }
             //如果文件为空，返回错误信息
 
-            if (file == null)
+            if (file1 == null ||file2 == null)
             {
                 return new JsonResult(new ResultState(false, "未添加文件", 0, null));
             }
 
-            List<String> urls = InputFile.inputFile(file);
+            
             try
             {
-                if (urls[0] == "null")
+                List<String> urls1 = InputFile.inputFile(file1);
+                List<String> urls2 = InputFile.inputFile(file2);
+
+                if (urls1[0] == "null" || urls2[0]=="null")
                 {
                   
                     return new JsonResult(new ResultState(false, "文件参数异常", 0, null));
                 }
-                else if (urls[0] == "error")
+                else if (urls1[0] == "error" || urls2[0] == "error")
                 {
                     return new JsonResult(new ResultState(false, "音乐上传失败", 0, null));
 
                 }
                 else
                 {
-                    var song = new MusicSong(name,album,artists,lyric,urls[0],urls[1]);
+                    var song = new MusicSong(name,album,artists,lyric,urls1[0],urls2[0]);
                     _context.MusicSongs.Add(song);
                     _context.SaveChanges();
                     return new JsonResult(new ResultState(true, "上传成功", 1, song));
@@ -453,7 +461,7 @@ namespace live.Controllers
             }
             catch
             {
-                return new JsonResult(new ResultState(false, "上传失败", 0, null));
+                return new JsonResult(new ResultState(false, "上传失败，请检查参数名称", 0, null));
             }
 
         }
