@@ -107,6 +107,7 @@ namespace live.Controllers
         {
 
             string s = _helper.GetCookie("token");
+
             if (s == null)
             {
                 return new ResultState(false, "请登录", 0, null);
@@ -114,7 +115,7 @@ namespace live.Controllers
             var a = s.Split(",");
             try
             {
-                var user = _context.Users.Find(int.Parse(a[0]));
+                var user = _context.MusicUsers.Find(int.Parse(a[0]));
                 if (user != null)
                 {
                     return new ResultState(true, "验证成功", 1, null);
