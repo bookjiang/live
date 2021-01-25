@@ -61,7 +61,7 @@ namespace live.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{id}")]
+        [HttpGet("GetUser/{id}")]
         public JsonResult GetUser(int id)
         {
             ResultState resultState = CheckCookie();
