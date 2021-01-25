@@ -23,13 +23,13 @@ namespace live.Models
         //    this.count = count;
 
         //}
-        public PageInfoList(int count, int pageIndex, int pageSize, object items)
-        {
-            this.pageIndex = pageIndex;
-            this.pageSize = pageSize;
-            this.items = items;
-            this.count = count;
-        }
+        //public PageInfoList(int count,int pageIndex,int pageSize,object items)
+        //{
+        //    this.pageIndex = pageIndex;
+        //    this.pageSize = pageSize;
+        //    this.items = items;
+        //    this.count = count;
+        //}
 
 
         public int count { get; set; }
