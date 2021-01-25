@@ -315,15 +315,18 @@ namespace live.Controllers
         /// 修改歌单，操作者没有修改的属性请赋原值传递给后端
         /// </summary>
         /// <param name="file"></param>
-        /// <param name="id"></param>
+        /// <param name="id_1"></param>
         /// <param name="name"></param>
         /// <param name="describe"></param>
-        /// <param name="user_id"></param>
-        /// <param name="status"></param>
+        /// <param name="user_id_1"></param>
+        /// <param name="status_1"></param>
         /// <returns></returns>
         [HttpPut("updateSongList")]
-        public JsonResult updateSongList(IFormFileCollection file, [FromForm] int id, [FromForm] string name, [FromForm] string describe, [FromForm] int user_id, [FromForm] int status)
+        public JsonResult updateSongList(IFormFileCollection file, [FromForm] string id_1, [FromForm] string name, [FromForm] string describe, [FromForm] string user_id_1, [FromForm] string status_1)
         {
+            int id = int.Parse(id_1);
+            int user_id = int.Parse(user_id_1);
+            int status = int.Parse(status_1);
 
             MusicSongList musicSongList = _context.MusicSongLists.Find(id);
             if (musicSongList == null)

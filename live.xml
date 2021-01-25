@@ -201,16 +201,16 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:live.Controllers.MusicSongListController.updateSongList(Microsoft.AspNetCore.Http.IFormFileCollection,System.Int32,System.String,System.String,System.Int32,System.Int32)">
+        <member name="M:live.Controllers.MusicSongListController.updateSongList(Microsoft.AspNetCore.Http.IFormFileCollection,System.String,System.String,System.String,System.String,System.String)">
             <summary>
             修改歌单，操作者没有修改的属性请赋原值传递给后端
             </summary>
             <param name="file"></param>
-            <param name="id"></param>
+            <param name="id_1"></param>
             <param name="name"></param>
             <param name="describe"></param>
-            <param name="user_id"></param>
-            <param name="status"></param>
+            <param name="user_id_1"></param>
+            <param name="status_1"></param>
             <returns></returns>
         </member>
         <member name="M:live.Controllers.MusicSongListController.getSongs(live.Models.QueryParameters,System.Int32)">
