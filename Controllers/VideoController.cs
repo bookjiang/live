@@ -215,7 +215,9 @@ namespace live.Controllers
         [HttpPost("videoList")]
         public JsonResult VideoList([FromBody] QueryParameters query)
         {
-            int count = _context.RecordVideos.Count();
+
+
+            int count = _context.RecordVideos.Where(x => x.status == 1).Count();
             int pageSize1 = query.pageSize;
             List<RecordVideo> temp = new List<RecordVideo>();
             PageInfoList pageUsers = new PageInfoList();
@@ -239,6 +241,61 @@ namespace live.Controllers
             else
             {
                 temp = _context.RecordVideos.Where(x => x.status == 1).Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
+                pageUsers.items = temp;
+                pageUsers.count = count;
+                pageUsers.pageIndex = query.pageIndex;
+                pageUsers.pageSize = query.pageSize;
+            }
+
+            //PageInfoList<User> pageUsers = new PageInfoList<User>(temp, count, query.pageIndex, query.pageSize);
+            //pageUsers.items = temp;
+            //pageUsers.count = count;
+            //pageUsers.pageIndex = query.pageIndex;
+            //pageUsers.pageSize = query.pageSize;
+            ResultState resultState = new ResultState();
+            resultState.success = true;
+            resultState.message = "查询成功";
+            resultState.value = pageUsers;
+            return new JsonResult(resultState);
+
+        }
+
+
+
+        /// <summary>
+        /// 管理员获取视频列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpPost("videoListByAdmin")]
+        public JsonResult VideoListByAdmin([FromBody] QueryParameters query)
+        {
+
+
+            int count = _context.RecordVideos.Count();
+            int pageSize1 = query.pageSize;
+            List<RecordVideo> temp = new List<RecordVideo>();
+            PageInfoList pageUsers = new PageInfoList();
+            if (query.pageIndex <= 0)
+            {
+                temp = (List<RecordVideo>)_context.RecordVideos.Take(query.pageSize).ToList();
+                //temp = (List<RecordVideo>)_context.RecordVideos.Take(query.pageSize).ToList();
+                pageUsers.items = temp;
+                pageUsers.count = count;
+                pageUsers.pageIndex = 1;
+                pageUsers.pageSize = query.pageSize;
+            }
+            else if (query.pageSize * query.pageIndex > count)
+            {
+                temp = (List<RecordVideo>)_context.RecordVideos.Skip(count - (count % query.pageSize)).Take((count % query.pageSize)).ToList();
+                pageUsers.items = temp;
+                pageUsers.count = count;
+                pageUsers.pageIndex = count / query.pageSize + 1;
+                pageUsers.pageSize = query.pageSize;
+            }
+            else
+            {
+                temp = _context.RecordVideos.Skip((query.pageIndex - 1) * query.pageSize).Take(query.pageSize).ToList();
                 pageUsers.items = temp;
                 pageUsers.count = count;
                 pageUsers.pageIndex = query.pageIndex;

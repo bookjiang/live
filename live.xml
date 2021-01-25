@@ -220,11 +220,53 @@
             <param name="song_list_id"></param>
             <returns></returns>
         </member>
-        <member name="M:live.Controllers.MusicSongsController.AddSong(live.Models.MusicSong)">
+        <member name="M:live.Controllers.MusicSongsController.GetMusicSong(System.Nullable{System.Int32},System.Nullable{System.Int32})">
             <summary>
-            添加歌曲
+            获取所有评论(可以在查询字符串中设置pageSize和pageIndex,不设置的话，默认pageIndex=1,pageSize=5)
             </summary>
-            <param name="song"></param>
+            <param name="pageIndex"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.MusicSongsController.GetSong(System.Int32)">
+            <summary>
+            通过id查询歌曲
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.MusicSongsController.GetSongs(System.String,System.String)">
+            <summary>
+            通过查询Query String筛选歌曲列表
+            </summary>
+            <param name="name"></param>
+            <param name="artists"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.MusicSongsController.DeleteSong(System.Int32)">
+            <summary>
+            根据id删除歌曲
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.MusicSongsController.UpdateSongTextInfo(System.Int32,live.Models.MusicSong)">
+            <summary>
+            修改歌曲文本信息
+            </summary>
+            <param name="id">歌曲的id属性</param>
+            <param name="musicSong">歌曲json对象</param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.MusicSongsController.AddSong(Microsoft.AspNetCore.Http.IFormFileCollection,System.String,System.String,System.String,System.String)">
+            <summary>
+            上传音乐
+            </summary>
+            <param name="file">音乐本体（mp3格式）与封面文件（key名称必须都为file）</param>
+            <param name="name">音乐名称</param>
+            <param name="album">专辑名称</param>
+            <param name="artists">演唱者</param>
+            <param name="lyric">歌词</param>
             <returns></returns>
         </member>
         <member name="M:live.Controllers.MusicUsersController.register(live.Models.MusicUser)">
