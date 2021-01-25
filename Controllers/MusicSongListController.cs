@@ -224,7 +224,8 @@ namespace live.Controllers
         /// <param name="file"></param>
         /// <param name="name"></param>
         /// <param name="describe"></param>
-        /// <param name="user_id"></param>
+        /// <param name="user_id_1"></param>
+        /// <param name="status_1"></param>
         /// <returns></returns>
         [HttpPost("addSongList")]
         public JsonResult addSongList(IFormFileCollection file, [FromForm] string name, [FromForm] string describe, [FromForm] string user_id_1, [FromForm] string status_1 = "1")

@@ -11,6 +11,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:live.Controllers.AdminController.GetUser(System.Int32)">
+            <summary>
+            通过id查询User
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:live.Controllers.AdminController.UserInfoList(live.Models.QueryParameters)">
             <summary>
             查询用户表
@@ -183,7 +190,8 @@
             <param name="file"></param>
             <param name="name"></param>
             <param name="describe"></param>
-            <param name="user_id"></param>
+            <param name="user_id_1"></param>
+            <param name="status_1"></param>
             <returns></returns>
         </member>
         <member name="M:live.Controllers.MusicSongListController.deleteSongList(System.Int32)">
@@ -325,6 +333,12 @@
             登出，删除cookie
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.MusicUsersController.refresh">
+            <summary>
+            刷新cookie
+            </summary>
             <returns></returns>
         </member>
         <member name="M:live.Controllers.UsersController.register(live.Models.User)">
