@@ -73,8 +73,6 @@ namespace live.Controllers
 
         }
 
-
-
         /// <summary>
         /// 用户注册
         /// </summary>
@@ -252,7 +250,6 @@ namespace live.Controllers
 
         }
 
-
         /// <summary>
         /// 删除用户
         /// </summary>
@@ -295,8 +292,6 @@ namespace live.Controllers
 
         }
 
-
-
         /// <summary>
         /// 登出，删除cookie
         /// </summary>
@@ -310,5 +305,26 @@ namespace live.Controllers
 
         }
 
+        /// <summary>
+        /// 刷新cookie
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("refresh")]
+        public JsonResult refresh()
+        {
+            ResultState resultState = CheckCookie();
+            if (resultState.code == 1)
+            {
+                string s = _helper.GetCookie("token");
+                _helper.SetCookie("token", s, 66);
+                return new JsonResult(new ResultState(true, "刷新成功", 1, _helper.GetCookie("token")));
+
+            }
+            return new JsonResult(resultState);
+
+
+        }
     }
+
+
 }

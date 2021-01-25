@@ -55,6 +55,33 @@ namespace live.Controllers
             return _context.Admins.Find(id);
         }
 
+
+        /// <summary>
+        /// 通过id查询User
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public JsonResult GetUser(int id)
+        {
+            ResultState resultState = CheckCookie();
+            if (resultState.code == 1)
+            {
+                resultState.value = _context.Users.Find(id);
+                if (resultState.value == null)
+                {
+                    resultState.success = false;
+                    resultState.message = "用户不存在";
+
+                }
+
+            }
+            return new JsonResult(resultState);
+
+
+        }
+
+
         /// <summary>
         /// 查询用户表
         /// </summary>
@@ -594,6 +621,8 @@ namespace live.Controllers
 
 
         }
+
+
 
     }
 }
