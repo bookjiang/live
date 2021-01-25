@@ -496,15 +496,15 @@ namespace live.Controllers
         /// <summary>
         /// 根据歌单id删除歌曲id
         /// </summary>
-        /// <param name="song_id_1"></param>
-        /// <param name="song_list_id_1"></param>
+        /// <param name="song_id"></param>
+        /// <param name="song_list_id"></param>
         /// <returns></returns>
         [HttpDelete("DeleteSongFromSongList")]
-        public JsonResult DeleteSongFromSongList([FromForm] string song_id_1, [FromForm] string song_list_id_1)
+        public JsonResult DeleteSongFromSongList([FromQuery] int song_id, [FromQuery] int song_list_id)
         {
 
-            int song_id = int.Parse(song_id_1);
-            int song_list_id = int.Parse(song_list_id_1);
+           // int song_id = int.Parse(song_id_1);
+            //int song_list_id = int.Parse(song_list_id_1);
 
 
             ResultState resultState = CheckCookie();

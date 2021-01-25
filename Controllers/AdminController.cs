@@ -176,6 +176,7 @@ namespace live.Controllers
             {
                 if(UserNameExists(user.name))
                 {
+                    resultState.success = false;
                     resultState.message = "用户名已存在";
                     return new JsonResult(resultState);
                 }

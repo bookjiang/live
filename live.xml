@@ -228,12 +228,12 @@
             <param name="song_list_id_1"></param>
             <returns></returns>
         </member>
-        <member name="M:live.Controllers.MusicSongListController.DeleteSongFromSongList(System.String,System.String)">
+        <member name="M:live.Controllers.MusicSongListController.DeleteSongFromSongList(System.Int32,System.Int32)">
             <summary>
             根据歌单id删除歌曲id
             </summary>
-            <param name="song_id_1"></param>
-            <param name="song_list_id_1"></param>
+            <param name="song_id"></param>
+            <param name="song_list_id"></param>
             <returns></returns>
         </member>
         <member name="M:live.Controllers.MusicSongListController.GetSongListById(System.Int32)">
