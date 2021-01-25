@@ -176,7 +176,7 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:live.Controllers.MusicSongListController.addSongList(Microsoft.AspNetCore.Http.IFormFileCollection,System.String,System.String,System.Int32,System.Int32)">
+        <member name="M:live.Controllers.MusicSongListController.addSongList(Microsoft.AspNetCore.Http.IFormFileCollection,System.String,System.String,System.String,System.String)">
             <summary>
             增加歌单，表单提交
             </summary>
@@ -212,12 +212,27 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:live.Controllers.MusicSongListController.addSongAndSongList(System.Int32,System.Int32)">
+        <member name="M:live.Controllers.MusicSongListController.addSongAndSongList(System.String,System.String)">
             <summary>
             歌单添加歌曲
             </summary>
-            <param name="song_id"></param>
-            <param name="song_list_id"></param>
+            <param name="song_id_1"></param>
+            <param name="song_list_id_1"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.MusicSongListController.DeleteSongFromSongList(System.String,System.String)">
+            <summary>
+            根据歌单id删除歌曲id
+            </summary>
+            <param name="song_id_1"></param>
+            <param name="song_list_id_1"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.MusicSongListController.GetSongListById(System.Int32)">
+            <summary>
+            通过歌单id获取歌单详细信息
+            </summary>
+            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:live.Controllers.MusicSongsController.GetMusicSong(System.Nullable{System.Int32},System.Nullable{System.Int32})">
@@ -258,15 +273,16 @@
             <param name="musicSong">歌曲json对象</param>
             <returns></returns>
         </member>
-        <member name="M:live.Controllers.MusicSongsController.AddSong(Microsoft.AspNetCore.Http.IFormFileCollection,System.String,System.String,System.String,System.String)">
+        <member name="M:live.Controllers.MusicSongsController.AddSong(Microsoft.AspNetCore.Http.IFormFileCollection,Microsoft.AspNetCore.Http.IFormFileCollection,System.String,System.String,System.String,System.String)">
             <summary>
-            上传音乐
+            上传歌曲
             </summary>
-            <param name="file">音乐本体（mp3格式）与封面文件（key名称必须都为file）</param>
-            <param name="name">音乐名称</param>
-            <param name="album">专辑名称</param>
-            <param name="artists">演唱者</param>
-            <param name="lyric">歌词</param>
+            <param name="MusicFile">音乐本体文件</param>
+            <param name="PictureFile">音乐封面图片</param>
+            <param name="name"></param>
+            <param name="album"></param>
+            <param name="artists"></param>
+            <param name="lyric"></param>
             <returns></returns>
         </member>
         <member name="M:live.Controllers.MusicUsersController.register(live.Models.MusicUser)">
@@ -388,6 +404,13 @@
         <member name="M:live.Controllers.VideoController.VideoList(live.Models.QueryParameters)">
             <summary>
             获取视频列表
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.VideoController.VideoListByAdmin(live.Models.QueryParameters)">
+            <summary>
+            管理员获取视频列表
             </summary>
             <param name="query"></param>
             <returns></returns>

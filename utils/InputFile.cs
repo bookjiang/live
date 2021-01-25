@@ -20,8 +20,10 @@ namespace live.utils
                 fileList[0] = "null";
                 return fileList;
             }
-            string keyword1 = file[0].FileName;
-            string filePath = "E:\\音乐项目文件夹\\" + Path.GetFileNameWithoutExtension(keyword1) + "\\";
+            //string keyword1 = file[0].FileName;
+            //string filePath = "E:\\音乐项目文件夹\\" + Path.GetFileNameWithoutExtension(keyword1) + "\\";
+            string filePath = "/usr/local/nginx/html/images/";
+
             //Console.WriteLine("在foreach外面");
             //IFormFileCollection file = items.GetFile
             try
@@ -53,7 +55,7 @@ namespace live.utils
                     }
                     //String path = filePath.Replace("\\", "/") + s;
                     //recordVideo.url = "http://" + _accessor.HttpContext.Request.Host + "/upload/" + recordVideo.guid + "/" + recordVideo.filename;
-                    String url = "http://218.244.154.17/" + keyword;
+                    String url = "http://218.244.154.17/images/" + keyword;
                     //recordVideo.createTime = DateTime.Now.ToString();
                     //recordVideo.status = 0;  //上传时默认未审核
                     //recordVideo.anchor_id = anchor_id;
