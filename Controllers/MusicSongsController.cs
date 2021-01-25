@@ -144,12 +144,12 @@ namespace live.Controllers
         [HttpGet]
         public async Task<JsonResult> GetMusicSong([FromQuery] int? pageIndex, [FromQuery] int? pageSize)
         {
-            ResultState resultState = CheckCookie();
+            //ResultState resultState = CheckCookie();
 
-            if (resultState.code == 0)
-            {
-                return new JsonResult(resultState);
-            }
+            //if (resultState.code == 0)
+            //{
+            //    return new JsonResult(resultState);
+            //}
 
             if (pageIndex == null)
             {
@@ -188,7 +188,7 @@ namespace live.Controllers
                 return new JsonResult(new ResultState(false, "获取歌曲列表失败", 0, null));
             }
 
-            return new JsonResult(new ResultState(true, "获取歌曲列表成功", 1, list));
+            return new JsonResult(new ResultState(true, "获取歌曲列表成功", 1, new PageInfoList(count,(int)pageIndex,(int)pageSize,list)));
         }
  
 
