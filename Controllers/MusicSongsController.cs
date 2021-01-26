@@ -187,7 +187,7 @@ namespace live.Controllers
                 return new JsonResult(new ResultState(false, "获取歌曲列表失败", 0, null));
             }
 
-            return new JsonResult(new ResultState(true, "获取歌曲列表成功", 1, new PageInfoList(count, (int)pageIndex, (int)pageSize, list)));
+            return new JsonResult(new ResultState(true, "获取歌曲列表成功", 1, new PageInfoList(count,(int)pageIndex,(int)pageSize,list)));
         }
  
 
