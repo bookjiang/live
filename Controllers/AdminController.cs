@@ -55,6 +55,63 @@ namespace live.Controllers
             return _context.Admins.Find(id);
         }
 
+        /// <summary>
+        /// 修改管理员个人信息
+        /// </summary>
+        /// <param name="admin"></param>
+        /// <returns></returns>
+        [HttpPut("UpdateAdminInfo")]
+        public JsonResult UpdateAdminInfo(Admin admin)
+        {
+            ResultState resultState = CheckCookie();
+            if (resultState.code == 1)
+            {
+                var admin1 = _context.Admins.Find(admin.id);
+                if (admin.name == admin1.name && admin.tel == admin1.tel && admin.role == admin1.role && admin.psd == admin1.psd)
+                {
+                    resultState.message = "未做任何修改";
+                    return new JsonResult(resultState);
+                }
+                else if (admin.name != admin1.name && AdminNameExists(admin.name))
+                {
+                    resultState.message = "用户名已存在 请重新设定";
+                    resultState.value = admin1;
+                    return new JsonResult(resultState);
+                }
+                //修改用户信息
+                admin1.name = admin.name;
+                admin1.tel = admin.tel;
+                admin1.role = admin.role;
+                admin1.psd = admin.psd;
+                _context.SaveChanges();
+                resultState.success = true;
+                resultState.message = "修改成功";
+                resultState.code = 1;
+                resultState.value = admin;
+            }
+            return new JsonResult(resultState);
+        }
+       
+
+
+        /// <summary>
+        /// 通过id查询video
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetVideo/{id}")]
+        public ActionResult<RecordVideo> GetVideo(int id)
+        {
+            ResultState resultState = CheckCookie();
+            if(resultState.code == 1)
+            {
+                resultState.value = _context.RecordVideos.Find(id);
+                return new JsonResult(resultState);
+            }
+            resultState.success = false;
+            return new JsonResult(resultState);
+        }
+
 
         /// <summary>
         /// 通过id查询User
@@ -355,7 +412,7 @@ namespace live.Controllers
 
 
         /// <summary>
-        /// 添加关键词
+        /// 添加关键字
         /// </summary>
         /// <param name="keyword"></param>
         /// <returns></returns>
