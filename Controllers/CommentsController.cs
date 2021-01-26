@@ -149,8 +149,10 @@ namespace live.Controllers
             var a = s.Split(",");
             try
             {
+                var admin = _context.Admins.Find(int.Parse(a[0]));
                 var user = _context.Users.Find(int.Parse(a[0]));
-                if (user != null)
+
+                if (user != null|| admin != null)
                 {
                     return new ResultState(true, "验证成功", 1, null);
                 }
