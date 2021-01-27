@@ -123,6 +123,12 @@ namespace live.Controllers
             var user1 = _context.MusicUsers.Where(x => x.name == user.name).FirstOrDefault();  //lambda表达式写错=>写成==>
             if (user.psd == user1.psd)
             {
+                if(user1.role ==1 && user.role == 0)
+                {
+                    resultState.success = false;
+                    resultState.message = "登录失败 权限不够";
+                    return new JsonResult(resultState);
+                }                
                 resultState.success = true;
                 resultState.message = "登录成功";
                 resultState.value = user1;
