@@ -11,6 +11,20 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:live.Controllers.AdminController.UpdateAdminInfo(live.Models.Admin)">
+            <summary>
+            修改管理员个人信息
+            </summary>
+            <param name="admin"></param>
+            <returns></returns>
+        </member>
+        <member name="M:live.Controllers.AdminController.GetVideo(System.Int32)">
+            <summary>
+            通过id查询video
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:live.Controllers.AdminController.GetUser(System.Int32)">
             <summary>
             通过id查询User
@@ -76,7 +90,7 @@
         </member>
         <member name="M:live.Controllers.AdminController.AddKeyword(live.Models.Keyword)">
             <summary>
-            添加关键词
+            添加关键字
             </summary>
             <param name="keyword"></param>
             <returns></returns>
