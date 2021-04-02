@@ -13,9 +13,25 @@
 
   <ItemGroup>
     <Compile Remove="publish1\**" />
+    <Compile Remove="publish2\**" />
+    <Compile Remove="publish3\**" />
+    <Compile Remove="publish4\**" />
+    <Compile Remove="publish\**" />
     <Content Remove="publish1\**" />
+    <Content Remove="publish2\**" />
+    <Content Remove="publish3\**" />
+    <Content Remove="publish4\**" />
+    <Content Remove="publish\**" />
     <EmbeddedResource Remove="publish1\**" />
+    <EmbeddedResource Remove="publish2\**" />
+    <EmbeddedResource Remove="publish3\**" />
+    <EmbeddedResource Remove="publish4\**" />
+    <EmbeddedResource Remove="publish\**" />
     <None Remove="publish1\**" />
+    <None Remove="publish2\**" />
+    <None Remove="publish3\**" />
+    <None Remove="publish4\**" />
+    <None Remove="publish\**" />
   </ItemGroup>
 
   <ItemGroup>
