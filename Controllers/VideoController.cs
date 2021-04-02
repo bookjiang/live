@@ -206,8 +206,8 @@ namespace live.Controllers
                         }
                         using (FileStream fs = System.IO.File.Create(filePath + pictureFile.FileName))
                         {
-                            // 复制文件
-                            videoFile.CopyTo(fs);
+                        // 复制文件
+                            pictureFile.CopyTo(fs);
                             // 清空缓冲区数据
                             fs.Flush();
                         }
