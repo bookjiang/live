@@ -12,7 +12,7 @@ namespace live.Models
         {
 
 
-        }
+        }//test
         [Key]
         public int id { get; set; }
         public string name { get; set; }

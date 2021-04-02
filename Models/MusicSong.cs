@@ -12,7 +12,7 @@ namespace live.Models
         {
 
         }
-        //用于添加歌曲的构造函数（不需要id）
+        //用于添加歌曲的构造函数（不需要id）//
         public MusicSong(string name, string album, string artists, string lyric, string play_url, string cover_post)
         {
             
