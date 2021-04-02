@@ -27,6 +27,9 @@ namespace live.Models
         public string  path { get; set; }
         public string createTime { get; set; }
 
+        //封面图片的url
+        public string picture_url { get; set; }
+
     }
 }
 

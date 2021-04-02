@@ -80,27 +80,111 @@ namespace live.Controllers
         /// <summary>
         /// 文件上传
         /// </summary>
+        //[HttpPost("uploadFile")]
+        //public JsonResult uploadFile(IFormFileCollection file,[FromForm]int anchor_id, [FromForm] string category)
+        //{
+
+        //    ResultState resultState = CheckCookie();
+        //    if (resultState.code !=0)
+        //    {
+
+        //        //ResultState resultState = new ResultState();
+        //        List<RecordVideo> fileList = new List<RecordVideo>();
+        //        if (file.Count == 0)
+        //            return new JsonResult(new ResultState(false, "未上传文件", 0, null));
+
+        //        //IFormFileCollection file = items.GetFile
+        //        try
+        //        {
+        //            foreach (var item in file)
+        //            {
+        //                RecordVideo recordVideo = new RecordVideo();
+        //                recordVideo.keyword = item.FileName;
+        //                recordVideo.size = item.Length / 1024;
+        //                recordVideo.type = recordVideo.keyword.Substring(recordVideo.keyword.LastIndexOf('.') + 1).ToUpper();
+        //                // recordVideo.guid = Guid.NewGuid().ToString();
+
+        //                //string filePath = hostEnv.ContentRootPath + "/wwwroot/upload/" + recordVideo.guid + @"/";
+        //                string filePath = "/usr/local/nginx/html/mp4/";
+        //                //string filePath = "E:\\";
+
+        //                if (!Directory.Exists(filePath))
+        //                {
+        //                    Directory.CreateDirectory(filePath);
+        //                }
+
+        //                using (FileStream fs = System.IO.File.Create(filePath + recordVideo.keyword))
+        //                {
+        //                    // 复制文件
+        //                    item.CopyTo(fs);
+        //                    // 清空缓冲区数据
+        //                    fs.Flush();
+        //                }
+        //                recordVideo.path = filePath.Replace("\\", "/") + recordVideo.keyword;
+        //                //recordVideo.url = "http://" + _accessor.HttpContext.Request.Host + "/upload/" + recordVideo.guid + "/" + recordVideo.filename;
+        //                recordVideo.url = "http://1.15.84.163/" + recordVideo.keyword;
+        //                recordVideo.createTime = DateTime.Now.ToString();
+        //                recordVideo.status = 0;  //上传时默认未审核
+        //                recordVideo.anchor_id = anchor_id;
+        //                recordVideo.category = category;
+        //                //recordVideo.parentId = 0;
+        //                //recordVideo.isDeal = 0;
+        //                fileList.Add(recordVideo);
+
+
+        //            }
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            resultState.value = fileList;
+        //            resultState.success = false;
+        //            resultState.message = "插入失败";
+        //            return new JsonResult(resultState);
+        //        }
+
+
+        //        //将filelist写入数据库
+        //        //TODO
+
+
+        //        _context.RecordVideos.AddRange(fileList);
+        //        _context.SaveChanges();
+
+
+
+        //        //FileBus fileBus = new FileBus(_context);
+        //        //fileBus.AddList(fileList);
+        //        resultState.value = fileList;
+        //        resultState.success = true;
+        //        resultState.message = "插入成功";
+        //        return new JsonResult(resultState);
+
+        //    }
+        //    return new JsonResult(resultState);
+
+
+        //}
+
+
+
         [HttpPost("uploadFile")]
-        public JsonResult uploadFile(IFormFileCollection file,[FromForm]int anchor_id, [FromForm] string category)
+        public JsonResult uploadFile([FromForm] IFormFile videoFile, [FromForm] IFormFile pictureFile, 
+            [FromForm] int anchor_id, [FromForm] string category)
         {
 
             ResultState resultState = CheckCookie();
-            if (resultState.code !=0)
+            if (resultState.code != 0)
             {
-
-                //ResultState resultState = new ResultState();
-                List<RecordVideo> fileList = new List<RecordVideo>();
-                if (file.Count == 0)
-                    return new JsonResult(new ResultState(false, "未上传文件", 0, null));
-
+                if (videoFile == null || pictureFile == null)
+                    return new JsonResult(new ResultState(false, "未上传视频文件或者封面文件", 0, null));
+                RecordVideo recordVideo = new RecordVideo();
                 //IFormFileCollection file = items.GetFile
                 try
                 {
-                    foreach (var item in file)
-                    {
-                        RecordVideo recordVideo = new RecordVideo();
-                        recordVideo.keyword = item.FileName;
-                        recordVideo.size = item.Length / 1024;
+                 
+                        
+                        recordVideo.keyword = videoFile.FileName;
+                        recordVideo.size = videoFile.Length / 1024;
                         recordVideo.type = recordVideo.keyword.Substring(recordVideo.keyword.LastIndexOf('.') + 1).ToUpper();
                         // recordVideo.guid = Guid.NewGuid().ToString();
 
@@ -115,28 +199,36 @@ namespace live.Controllers
 
                         using (FileStream fs = System.IO.File.Create(filePath + recordVideo.keyword))
                         {
+                        // 复制文件
+                            videoFile.CopyTo(fs);
+                            // 清空缓冲区数据
+                            fs.Flush();
+                        }
+                        using (FileStream fs = System.IO.File.Create(filePath + pictureFile.FileName))
+                        {
                             // 复制文件
-                            item.CopyTo(fs);
+                            videoFile.CopyTo(fs);
                             // 清空缓冲区数据
                             fs.Flush();
                         }
                         recordVideo.path = filePath.Replace("\\", "/") + recordVideo.keyword;
                         //recordVideo.url = "http://" + _accessor.HttpContext.Request.Host + "/upload/" + recordVideo.guid + "/" + recordVideo.filename;
-                        recordVideo.url = "http://47.105.112.118/" + recordVideo.keyword;
+                        recordVideo.url = "http://1.15.84.163/" + recordVideo.keyword;
                         recordVideo.createTime = DateTime.Now.ToString();
                         recordVideo.status = 0;  //上传时默认未审核
                         recordVideo.anchor_id = anchor_id;
                         recordVideo.category = category;
-                        //recordVideo.parentId = 0;
-                        //recordVideo.isDeal = 0;
-                        fileList.Add(recordVideo);
+                        recordVideo.picture_url = "http://1.15.84.163/" + pictureFile.FileName;
 
 
-                    }
+
+
+
+
                 }
                 catch (Exception e)
                 {
-                    resultState.value = fileList;
+                    resultState.value = recordVideo;
                     resultState.success = false;
                     resultState.message = "插入失败";
                     return new JsonResult(resultState);
@@ -147,14 +239,14 @@ namespace live.Controllers
                 //TODO
 
 
-                _context.RecordVideos.AddRange(fileList);
+                _context.RecordVideos.AddRange(recordVideo);
                 _context.SaveChanges();
 
 
 
                 //FileBus fileBus = new FileBus(_context);
                 //fileBus.AddList(fileList);
-                resultState.value = fileList;
+                resultState.value = recordVideo;
                 resultState.success = true;
                 resultState.message = "插入成功";
                 return new JsonResult(resultState);
@@ -164,6 +256,7 @@ namespace live.Controllers
 
 
         }
+
 
         /// <summary>
         /// 通过id删除视频
