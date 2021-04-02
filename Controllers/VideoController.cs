@@ -190,9 +190,10 @@ namespace live.Controllers
 
                         //string filePath = hostEnv.ContentRootPath + "/wwwroot/upload/" + recordVideo.guid + @"/";
                         string filePath = "/usr/local/nginx/html/mp4/";
-                        //string filePath = "E:\\";
+                        string filePath1 = "/usr/local/nginx/html/images/";
+                    //string filePath = "E:\\";
 
-                        if (!Directory.Exists(filePath))
+                    if (!Directory.Exists(filePath))
                         {
                             Directory.CreateDirectory(filePath);
                         }
@@ -204,7 +205,7 @@ namespace live.Controllers
                             // 清空缓冲区数据
                             fs.Flush();
                         }
-                        using (FileStream fs = System.IO.File.Create(filePath + pictureFile.FileName))
+                        using (FileStream fs = System.IO.File.Create(filePath1 + pictureFile.FileName))
                         {
                         // 复制文件
                             pictureFile.CopyTo(fs);
@@ -218,7 +219,7 @@ namespace live.Controllers
                         recordVideo.status = 0;  //上传时默认未审核
                         recordVideo.anchor_id = anchor_id;
                         recordVideo.category = category;
-                        recordVideo.picture_url = "http://1.15.84.163/" + pictureFile.FileName;
+                        recordVideo.picture_url = "http://1.15.84.163/images/" + pictureFile.FileName;
 
 
 
