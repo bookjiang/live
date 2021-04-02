@@ -122,7 +122,7 @@ namespace live.Controllers
                         }
                         recordVideo.path = filePath.Replace("\\", "/") + recordVideo.keyword;
                         //recordVideo.url = "http://" + _accessor.HttpContext.Request.Host + "/upload/" + recordVideo.guid + "/" + recordVideo.filename;
-                        recordVideo.url = "http://218.244.154.17/" + recordVideo.keyword;
+                        recordVideo.url = "http://47.105.112.118/" + recordVideo.keyword;
                         recordVideo.createTime = DateTime.Now.ToString();
                         recordVideo.status = 0;  //上传时默认未审核
                         recordVideo.anchor_id = anchor_id;

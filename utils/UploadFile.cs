@@ -31,8 +31,8 @@ namespace live.utils
                     // recordVideo.guid = Guid.NewGuid().ToString();
 
                     //string filePath = hostEnv.ContentRootPath + "/wwwroot/upload/" + recordVideo.guid + @"/";
-                    string filePath = "/usr/local/nginx/html/images/";
-                    //string filePath = "E:\\";
+                    //string filePath = "/usr/local/nginx/html/images/";
+                    string filePath = "E:\\";
 
                     if (!Directory.Exists(filePath))
                     {
@@ -48,7 +48,7 @@ namespace live.utils
                     }
                     //String path = filePath.Replace("\\", "/") + s;
                     //recordVideo.url = "http://" + _accessor.HttpContext.Request.Host + "/upload/" + recordVideo.guid + "/" + recordVideo.filename;
-                    String url = "http://218.244.154.17/images/" + keyword;
+                    String url = "http://47.105.112.118/images/" + keyword;
                     //recordVideo.createTime = DateTime.Now.ToString();
                     //recordVideo.status = 0;  //上传时默认未审核
                     //recordVideo.anchor_id = anchor_id;
